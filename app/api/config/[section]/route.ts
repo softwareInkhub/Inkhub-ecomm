@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
 
-const CONFIG_PATH = path.join(process.cwd(), '..', 'config.json')
+const CONFIG_PATH = path.join(process.cwd(), '/jsondata/config.json')
 
 export async function GET(
   request: NextRequest,

@@ -1,0 +1,61 @@
+[
+  {
+    "id": "minimal",
+    "name": "Minimal",
+    "description": "A minimal, elegant theme with clean lines and subtle colors",
+    "componentsPath": "themes/minimal/components",
+    "schema": [
+      {
+        "id": "primaryColor",
+        "label": "Primary Color",
+        "type": "color",
+        "default": "#000000",
+        "group": "Colors",
+        "description": "Main brand color"
+      },
+      {
+        "id": "backgroundColor",
+        "label": "Background Color",
+        "type": "color",
+        "default": "#ffffff",
+        "group": "Colors"
+      },
+      {
+        "id": "heroText",
+        "label": "Hero Text",
+        "type": "text",
+        "default": "Minimal Design",
+        "group": "Content"
+      },
+      {
+        "id": "fontFamily",
+        "label": "Font Family",
+        "type": "select",
+        "default": "Inter",
+        "options": [
+          {
+            "label": "Inter",
+            "value": "Inter"
+          },
+          {
+            "label": "Poppins",
+            "value": "Poppins"
+          },
+          {
+            "label": "Roboto",
+            "value": "Roboto"
+          }
+        ],
+        "group": "Typography"
+      },
+      {
+        "id": "spacing",
+        "label": "Spacing",
+        "type": "number",
+        "default": 16,
+        "group": "Layout",
+        "description": "Base spacing unit in pixels"
+      }
+    ]
+  }
+]

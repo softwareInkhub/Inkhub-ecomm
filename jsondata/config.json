@@ -1,0 +1,282 @@
+{
+  "homepage": {
+    "sections": [
+      {
+        "id": "hero-banner",
+        "type": "hero-banner",
+        "enabled": true,
+        "order": 0
+      },
+      {
+        "id": "hero-section",
+        "type": "hero-section",
+        "enabled": true,
+        "order": 1
+      },
+      {
+        "id": "spiritual",
+        "type": "products",
+        "enabled": true,
+        "order": 2,
+        "category": "Spiritual Collection"
+      },
+      {
+        "id": "poster-anime",
+        "type": "poster",
+        "enabled": true,
+        "order": 3,
+        "imageType": "anime"
+      },
+      {
+        "id": "love-couple",
+        "type": "products",
+        "enabled": true,
+        "order": 4,
+        "category": "Love & Couple Tattoos"
+      },
+      {
+        "id": "poster-japanese",
+        "type": "poster",
+        "enabled": true,
+        "order": 5,
+        "imageType": "japanese"
+      },
+      {
+        "id": "anime-pop",
+        "type": "products",
+        "enabled": true,
+        "order": 6,
+        "category": "Anime & Pop Tattoos"
+      },
+      {
+        "id": "animal",
+        "type": "products",
+        "enabled": true,
+        "order": 7,
+        "category": "Animal Tattoos"
+      },
+      {
+        "id": "countdown",
+        "type": "countdown",
+        "enabled": true,
+        "order": 8
+      },
+      {
+        "id": "minimal",
+        "type": "products",
+        "enabled": true,
+        "order": 9,
+        "category": "Minimal Tattoos"
+      },
+      {
+        "id": "bold-dark",
+        "type": "products",
+        "enabled": true,
+        "order": 10,
+        "category": "Bold & Dark Tattoos"
+      },
+      {
+        "id": "tattoo-packs",
+        "type": "products",
+        "enabled": true,
+        "order": 11,
+        "category": "Tattoos Packs"
+      },
+      {
+        "id": "body-placement",
+        "type": "products",
+        "enabled": true,
+        "order": 12,
+        "category": "Body Placement Tattoos"
+      },
+      {
+        "id": "lifestyle",
+        "type": "products",
+        "enabled": true,
+        "order": 13,
+        "category": "Lifestyle Tattoos"
+      },
+      {
+        "id": "size-type",
+        "type": "products",
+        "enabled": true,
+        "order": 14,
+        "category": "Tattoos Size & Type"
+      },
+      {
+        "id": "all-tattoos",
+        "type": "products",
+        "enabled": true,
+        "order": 15,
+        "category": "All Tattoos"
+      }
+    ],
+    "heroBanners": [],
+    "heroSection": {
+      "categoryGrid": {
+        "enabled": true,
+        "showAllButton": true
+      },
+      "scrollablePosters": {
+        "enabled": true,
+        "autoScroll": true,
+        "scrollInterval": 2500,
+        "numberOfPosters": 2
+      },
+      "latestDrops": {
+        "enabled": true,
+        "title": "Latest Drops",
+        "numberOfItems": 4,
+        "showProductNames": true,
+        "categoryFilter": null,
+        "sortBy": "newest"
+      },
+      "offers": {
+        "enabled": true,
+        "title": "Offers",
+        "layout": "grid",
+        "columns": 2,
+        "items": [
+          {
+            "image": "/images/offer_pack.webp",
+            "alt": "Offer Pack",
+            "filter": null,
+            "enabled": true
+          },
+          {
+            "image": "/images/offer_40_percent.webp",
+            "alt": "40% Off Offer",
+            "filter": "discount40",
+            "enabled": true
+          },
+          {
+            "image": "/images/offer_999.webp",
+            "alt": "999 Offer",
+            "filter": "below999",
+            "enabled": true
+          },
+          {
+            "image": "/images/offer_499.webp",
+            "alt": "499 Offer",
+            "filter": "below499",
+            "enabled": true
+          }
+        ]
+      },
+      "heroPosterInline": {
+        "enabled": true
+      }
+    }
+  },
+  "trends": {
+    "sections": [
+      {
+        "id": "anime-trend",
+        "title": "ANIME & POP TATTOOS",
+        "subtitle": "EXPRESS YOUR FANDOM",
+        "tagline": "ICONIC DESIGNS",
+        "image": "",
+        "buttonText": "SHOP NOW",
+        "bgColor": "linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)",
+        "order": 0,
+        "products": [
+          "10152481292603",
+          "9590022406459",
+          "9590022406459"
+        ]
+      },
+      {
+        "id": "minimal-trend",
+        "title": "MINIMAL TATTOOS",
+        "subtitle": "LESS IS MORE",
+        "tagline": "ELEGANT SIMPLICITY",
+        "image": "",
+        "buttonText": "EXPLORE",
+        "bgColor": "linear-gradient(135deg, #d97706 0%, #92400e 100%)",
+        "order": 1,
+        "products": [
+          "9590022406459"
+        ]
+      },
+      {
+        "id": "trend-1763014758781",
+        "title": "TOP PICKS",
+        "subtitle": "ANYTHIN",
+        "tagline": "EXPLORE OUR TOP PICKS",
+        "image": "",
+        "buttonText": "SHOP NOW",
+        "bgColor": "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
+        "order": 2,
+        "products": [
+          "9590022406459"
+        ]
+      },
+      {
+        "id": "trend-1763019769947",
+        "title": "NEW TREND",
+        "subtitle": "SUBTITLE",
+        "tagline": "TAGLINE",
+        "image": "",
+        "buttonText": "SHOP NOW",
+        "bgColor": "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
+        "order": 3,
+        "products": [
+          "9590022406459"
+        ]
+      }
+    ]
+  },
+  "categories": {
+    "enabled": [
+      "All Tattoos",
+      "Spiritual Collection",
+      "Love & Couple Tattoos",
+      "Anime & Pop Tattoos",
+      "Animal Tattoos",
+      "Minimal Tattoos",
+      "Bold & Dark Tattoos",
+      "Tattoos Packs",
+      "Body Placement Tattoos",
+      "Lifestyle Tattoos",
+      "Tattoos Size & Type"
+    ],
+    "order": [
+      "All Tattoos",
+      "Spiritual Collection",
+      "Love & Couple Tattoos",
+      "Anime & Pop Tattoos",
+      "Animal Tattoos",
+      "Minimal Tattoos",
+      "Bold & Dark Tattoos",
+      "Tattoos Packs",
+      "Body Placement Tattoos",
+      "Lifestyle Tattoos",
+      "Lifestyle Tattoos",
+      "Tattoos Size & Type"
+    ]
+  },
+  "termsConditions": {
+    "title": "Terms & Conditions",
+    "content": "# Terms & Conditions\n\n# 1. Welcome to Inkhub. By accessing and using our services, you agree to be bound by these Terms and Conditions. Please read them carefully before using our platform.\n\n## 2. Use of Service\nYou must be at least 18 years old to use our services. By using Inkhub, you represent that you meet this age requirement and have the legal capacity to enter into these Terms.\n\n## 3. Account Registration\nTo place orders, you must create an account with accurate information. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.\n\n## 4. Orders and Payments\nAll orders are subject to product availability. We reserve the right to refuse or cancel any order at our discretion. Prices are subject to change without notice. Payment must be made in full before delivery.\n\n## 5. Delivery\nWe strive to deliver within 60 minutes, but delivery times may vary based on location and circumstances beyond our control. We are not liable for delays in delivery.\n\n## 6. Returns and Refunds\nReturns are accepted within 7 days of delivery for defective or damaged products. Refunds will be processed within 5-7 business days after approval.\n\n## 7. Intellectual Property\nAll content, trademarks, and intellectual property on Inkhub belong to us. You may not use, copy, or distribute any content without our prior written permission.\n\n## 8. Limitation of Liability\nInkhub shall not be liable for any indirect, incidental, or consequential damages arising from the use of our services. Our total liability shall not exceed the amount paid for the order.\n\n## 9. Changes to Terms\nWe reserve the right to modify these Terms at any time. Continued use of our services after changes constitutes acceptance of the modified Terms.\n\n## 10. Contact Us\nIf you have any questions about these Terms, please contact us at support@Inkhub.com or call +91 98765 43210.",
+    "lastUpdated": "November 6, 2025"
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "content": "# Privacy Policy\n\n## 1. Information We Collect\nWe collect personal information including your name, phone number, email address, and delivery addresses when you register and use our services. We also collect order history and payment information.\n\n## 2. How We Use Your Information\nWe use your information to process orders, provide customer support, send order updates, improve our services, and communicate promotional offers with your consent.\n\n## 3. Information Sharing\nWe do not sell your personal information. We may share data with delivery partners and payment processors solely for fulfilling orders. We may also disclose information when required by law.\n\n## 4. Data Security\nWe implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.\n\n## 5. Cookies and Tracking\nWe use cookies and similar technologies to enhance user experience, analyze usage patterns, and remember your preferences. You can control cookie settings through your browser.\n\n## 6. Your Rights\nYou have the right to access, update, or delete your personal information. You can also opt-out of promotional communications. Contact us to exercise these rights.\n\n## 7. Data Retention\nWe retain your personal information for as long as necessary to provide services and comply with legal obligations. Order history may be retained for record-keeping purposes.\n\n## 8. Third-Party Links\nOur platform may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. Please review their privacy policies.\n\n## 9. Children's Privacy\nOur services are not intended for children under 18. We do not knowingly collect personal information from children. If you believe we have collected such data, please contact us.\n\n## 10. Changes to Privacy Policy\nWe may update this Privacy Policy from time to time. We will notify you of significant changes via email or app notification. Continued use indicates acceptance of the updated policy.\n\n## 11. Contact Us\nFor privacy-related questions or concerns, contact us at privacy@Inkhub.com or +91 98765 43210. We will respond to your inquiries within 48 hours.",
+    "lastUpdated": "November 6, 2025"
+  },
+  "referEarn": {
+    "referralCode": "INK250",
+    "rewardAmount": 250,
+    "totalEarned": 0,
+    "shareMessage": "Join Inkhub and get amazing tattoos! Use my referral code {code} to get ₹{amount} off on your first order. Download now: {url}",
+    "shareUrl": "https://Inkhub.app",
+    "maxReferrals": 10,
+    "bonusAmount": 2500
+  },
+  "privacy-policy": {
+    "title": "Privacy Policy",
+    "content": "# Privacy Policy\n\n## 2. How We Use Your Information\nWe use your information to process orders, provide customer support, send order updates, improve our services, and communicate promotional offers with your consent.\n\n## 3. Information Sharing\nWe do not sell your personal information. We may share data with delivery partners and payment processors solely for fulfilling orders. We may also disclose information when required by law.\n\n## 4. Data Security\nWe implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.\n\n## 5. Cookies and Tracking\nWe use cookies and similar technologies to enhance user experience, analyze usage patterns, and remember your preferences. You can control cookie settings through your browser.\n\n## 6. Your Rights\nYou have the right to access, update, or delete your personal information. You can also opt-out of promotional communications. Contact us to exercise these rights.\n\n## 7. Data Retention\nWe retain your personal information for as long as necessary to provide services and comply with legal obligations. Order history may be retained for record-keeping purposes.\n\n## 8. Third-Party Links\nOur platform may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. Please review their privacy policies.\n\n## 9. Children's Privacy\nOur services are not intended for children under 18. We do not knowingly collect personal information from children. If you believe we have collected such data, please contact us.\n\n## 10. Changes to Privacy Policy\nWe may update this Privacy Policy from time to time. We will notify you of significant changes via email or app notification. Continued use indicates acceptance of the updated policy.\n\n## 11. Contact Us\nFor privacy-related questions or concerns, contact us at privacy@Inkhub.com or +91 98765 43210. We will respond to your inquiries within 48 hours.",
+    "lastUpdated": "November 6, 2025"
+  }
+}
