@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AdminPreviewHighlighter from "@/components/AdminPreviewHighlighter";
 import { RedisInitializer } from "@/components/RedisInitializer";
-import '@/lib/redis'; // Initialize Redis on server startup
 
 const inter = Inter({
   subsets: ["latin"],

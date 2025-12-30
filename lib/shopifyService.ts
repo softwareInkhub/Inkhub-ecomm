@@ -4,6 +4,8 @@
  * This service handles order creation in Shopify
  */
 
+'use server'
+
 import type { ShopifyOrderData, DiscountCode } from '@/types'
 import { getCachedCoupon, setCachedCoupon } from './couponCache'
 

@@ -1,3 +1,5 @@
+'use server'
+
 import redis from './redis'
 import type { DiscountCode } from '@/types'
 

@@ -26,8 +26,15 @@ export default function PaymentPage() {
   const [selectedPayment, setSelectedPayment] = useState('razorpay')
   const [isProcessing, setIsProcessing] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    
     // Scroll to top when page loads
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0)
@@ -51,7 +58,7 @@ export default function PaymentPage() {
     } else {
       setCartItems(items)
     }
-  }, [router])
+  }, [mounted, router])
 
   const calculateSubtotal = () => {
     return cartItems.reduce((sum, item) => {
@@ -73,6 +80,7 @@ export default function PaymentPage() {
   }
 
   const calculateCouponDiscount = () => {
+    if (!mounted) return 0
     const coupon = getAppliedCoupon()
     if (coupon && coupon.discountAmount) {
       return coupon.discountAmount
@@ -80,7 +88,7 @@ export default function PaymentPage() {
     return 0
   }
 
-  const total = calculateSubtotal() - calculateCouponDiscount()
+  const total = mounted ? Math.max(0, calculateSubtotal() - calculateCouponDiscount()) : 0
 
   const paymentMethods = [
     {
@@ -560,36 +568,39 @@ export default function PaymentPage() {
         )}
 
         {/* Order Summary */}
-        <div className="payment-summary-card">
-          <h3 className="payment-section-title">Order Summary</h3>
-          <div className="payment-summary-row">
-            <span>Subtotal</span>
-            <span>₹{calculateSubtotal().toFixed(0)}</span>
-          </div>
-          {getAppliedCoupon() && (
+        {mounted && (
+          <div className="payment-summary-card">
+            <h3 className="payment-section-title">Order Summary</h3>
             <div className="payment-summary-row">
-              <span>Coupon Discount ({getAppliedCoupon()?.code || 'Applied'})</span>
-              <span className="discount-amount">-₹{calculateCouponDiscount().toFixed(0)}</span>
+              <span>Subtotal</span>
+              <span>₹{calculateSubtotal().toFixed(0)}</span>
             </div>
-          )}
-          <div className="payment-summary-row">
-            <span>Delivery Fee</span>
-            <span className="free-text">FREE</span>
+            {getAppliedCoupon() && (
+              <div className="payment-summary-row">
+                <span>Coupon Discount ({getAppliedCoupon()?.code || 'Applied'})</span>
+                <span className="discount-amount">-₹{calculateCouponDiscount().toFixed(0)}</span>
+              </div>
+            )}
+            <div className="payment-summary-row">
+              <span>Delivery Fee</span>
+              <span className="free-text">FREE</span>
+            </div>
+            <div className="payment-summary-divider"></div>
+            <div className="payment-summary-row payment-summary-total">
+              <span>Total Amount</span>
+              <span>₹{total.toFixed(0)}</span>
+            </div>
           </div>
-          <div className="payment-summary-divider"></div>
-          <div className="payment-summary-row payment-summary-total">
-            <span>Total Amount</span>
-            <span>₹{total.toFixed(0)}</span>
-          </div>
-        </div>
+        )}
       </main>
 
       {/* Fixed Bottom Button */}
-      <div className="payment-bottom-bar">
-        <div className="payment-bottom-info">
-          <span className="payment-bottom-label">Total Amount</span>
-          <span className="payment-bottom-price">₹{total.toFixed(0)}</span>
-        </div>
+      {mounted && (
+        <div className="payment-bottom-bar">
+          <div className="payment-bottom-info">
+            <span className="payment-bottom-label">Total Amount</span>
+            <span className="payment-bottom-price">₹{total.toFixed(0)}</span>
+          </div>
         <button 
           className="payment-place-order-btn"
           onClick={handlePlaceOrder}
@@ -597,7 +608,8 @@ export default function PaymentPage() {
         >
           {isProcessing ? 'Processing...' : 'Place Order'}
         </button>
-      </div>
+        </div>
+      )}
 
       {/* Processing Overlay */}
       {isProcessing && (
