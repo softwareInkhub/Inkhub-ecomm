@@ -5,6 +5,7 @@
  */
 
 import type { ShopifyOrderData, DiscountCode } from '@/types'
+import { getCachedCoupon, setCachedCoupon } from './couponCache'
 
 interface ShopifyOrderResponse {
   id: number
@@ -197,78 +198,58 @@ class ShopifyService {
    * @param cartTotal - The cart total amount
    * @returns Validation result with discount details
    */
-  async validateDiscountCode(discountCode: string, cartTotal: number): Promise<DiscountCode> {
-    try {
-      // Get backend API URL
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
-      
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('🌐 SHOPIFY SERVICE: Validating via Backend')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('🔗 Backend URL:', backendUrl)
-      console.log('📝 Code:', discountCode)
-      console.log('💰 Cart Total:', cartTotal)
+async validateDiscountCode(discountCode: string, cartTotal: number) {
+  const code = discountCode.toUpperCase()
 
-      const requestBody = {
-        code: discountCode,
-        cartTotal: cartTotal,
-      }
-      
-      console.log('📦 Request Body:', JSON.stringify(requestBody, null, 2))
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
-      // Call backend API to validate discount
-      const response = await fetch(`${backendUrl}/api/validate-discount`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('📡 SHOPIFY SERVICE: Backend Response')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('📊 Status:', response.status, response.statusText)
-      console.log('✅ Response OK:', response.ok)
-
-      const data = await response.json()
-      console.log('📦 Response Data:', JSON.stringify(data, null, 2))
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
-      if (response.ok && data.success && data.valid) {
-        console.log('✅ Discount code validated from Shopify:', data.code)
-        return {
-          valid: true,
-          code: data.code,
-          discountAmount: data.discountAmount,
-          discountType: data.discountType,
-          discountValue: data.discountValue,
-          priceRuleId: data.priceRuleId,
-          title: data.title,
-        }
-      } else if (data.valid === false) {
-        console.log('❌ Invalid discount code:', data.error)
-        return {
-          valid: false,
-          code: discountCode,
-          error: data.error || 'Invalid discount code',
-        }
-      } else {
-        throw new Error(data.error || 'Failed to validate discount code')
-      }
-    } catch (error) {
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('❌ SHOPIFY SERVICE: Error')
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('Error:', error)
-      console.error('Message:', (error as Error).message)
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.warn('⚠️ Using fallback validation')
-      // Use fallback validation when backend is not available
-      return this.fallbackValidation(discountCode, cartTotal)
+  try {
+    /* 1️⃣ CHECK REDIS */
+    const cached = await getCachedCoupon(code, cartTotal)
+    if (cached) {
+      console.log('⚡ Coupon cache HIT:', code)
+      return cached
     }
+
+    console.log('🐢 Coupon cache MISS:', code)
+
+    /* 2️⃣ BACKEND CALL */
+    const backendUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+
+    const response = await fetch(`${backendUrl}/api/validate-discount`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, cartTotal }),
+    })
+
+    const data = await response.json()
+
+    const result =
+      response.ok && data.success && data.valid
+        ? {
+            valid: true,
+            code: data.code,
+            discountAmount: data.discountAmount,
+            discountType: data.discountType,
+            discountValue: data.discountValue,
+            priceRuleId: data.priceRuleId,
+            title: data.title,
+          }
+        : {
+            valid: false,
+            code,
+            error: data.error || 'Invalid discount code',
+          }
+
+    /* 3️⃣ SAVE IN REDIS */
+    await setCachedCoupon(code, cartTotal, result)
+
+    return result
+  } catch (err) {
+    console.error('❌ Coupon validation failed:', err)
+    return this.fallbackValidation(code, cartTotal)
   }
+}
+
 
   /**
    * Fallback validation when Shopify API is not available

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import redis from '@/lib/redis'
 
 interface CartItem {
   id: string
@@ -578,34 +579,53 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // STEP 2: Fallback to searching through price rules if lookup failed
+    // STEP 2: Fallback to Redis cache if lookup failed
     if (!discountCode || !priceRule) {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('🔍 STEP 2: FALLBACK TO PRICE RULES SEARCH')
+      console.log('🔍 STEP 2: FALLBACK TO REDIS CACHE')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
-      const searchResult = await searchDiscountCodeInPriceRules(
-        storeUrl,
-        apiVersion,
-        headers,
-        normalizedCode
-      )
+      try {
+        // Try to get from Redis cache
+        const redisCacheKey = `discount:${normalizedCode}`
+        const cachedData = await redis.get(redisCacheKey)
 
-      if (!searchResult) {
+        if (cachedData) {
+          console.log('📦 Found discount in Redis cache')
+          const parsed = JSON.parse(cachedData)
+          discountCode = parsed.discountCode
+          priceRule = parsed.priceRule
+          console.log('✅ Discount code loaded from Redis')
+        } else {
+          console.log('❌ Code not in Redis - rejecting invalid code')
+          return NextResponse.json({
+            success: false,
+            valid: false,
+            error: 'Invalid discount code',
+          })
+        }
+      } catch (redisError) {
+        console.error('❌ Redis lookup error:', redisError)
         return NextResponse.json({
           success: false,
           valid: false,
-          error: 'Invalid discount code',
+          error: 'Failed to validate discount code',
         })
       }
-
-      discountCode = searchResult.discountCode
-      priceRule = searchResult.priceRule
-
-      console.log('✅ Discount code found via price rules search')
-      console.log('📋 Discount Code ID:', discountCode.id)
-      console.log('📋 Price Rule ID:', priceRule.id)
-      console.log('📋 Code:', discountCode.code)
+    } else {
+      // Lookup succeeded - cache it in Redis for future requests (30 min TTL)
+      try {
+        const redisCacheKey = `discount:${normalizedCode}`
+        await redis.setex(
+          redisCacheKey,
+          30 * 60, // 30 minutes
+          JSON.stringify({ discountCode, priceRule })
+        )
+        console.log('💾 Cached discount in Redis')
+      } catch (redisError) {
+        console.error('⚠️ Failed to cache in Redis:', redisError)
+        // Continue anyway - caching is optional
+      }
     }
 
     // Validate that we have both discount code and price rule
