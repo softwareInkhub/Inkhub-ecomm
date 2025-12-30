@@ -34,8 +34,18 @@ export async function POST(request: NextRequest) {
     const lastName = nameParts.slice(1).join(' ') || nameParts[0] // Use first name if no last name
 
     // Format phone number for Shopify (E.164 format: +[country code][number])
+    // Ensure phone is a string, not an array
+    let phoneInput = customer.phone
+    if (Array.isArray(phoneInput)) {
+      // If phone is an array, take the first element
+      phoneInput = phoneInput[0] || ''
+    }
+    if (typeof phoneInput !== 'string') {
+      phoneInput = String(phoneInput || '')
+    }
+    
     // Remove all non-digit characters and ensure it starts with country code
-    let formattedPhone = (customer.phone || '').replace(/\D/g, '') // Remove non-digits
+    let formattedPhone = phoneInput.replace(/\D/g, '') // Remove non-digits
     if (formattedPhone && formattedPhone.length === 10) {
       // If it's a 10-digit Indian number, add +91 prefix
       formattedPhone = `+91${formattedPhone}`
@@ -47,7 +57,12 @@ export async function POST(request: NextRequest) {
     const phoneForShopify = formattedPhone || undefined
 
     console.log('📝 Customer name split:', { original: customer.name, firstName, lastName })
-    console.log('📞 Phone formatting:', { original: customer.phone, formatted: phoneForShopify })
+    console.log('📞 Phone formatting:', { 
+      original: customer.phone, 
+      phoneInput: phoneInput,
+      formatted: phoneForShopify,
+      isArray: Array.isArray(customer.phone)
+    })
     console.log('📦 Line Items:', JSON.stringify(lineItems, null, 2))
 
     // Create order payload
@@ -102,8 +117,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Add phone number only if it's valid and formatted
-    if (phoneForShopify) {
-      orderPayload.order.customer.phone = phoneForShopify
+    // Shopify Admin API expects phone_number (not phone) for customer object
+    if (phoneForShopify && typeof phoneForShopify === 'string') {
+      orderPayload.order.customer.phone_number = phoneForShopify
       orderPayload.order.shipping_address.phone = phoneForShopify
       orderPayload.order.billing_address.phone = phoneForShopify
     }

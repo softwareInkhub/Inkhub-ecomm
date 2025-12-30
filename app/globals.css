@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Root theme - Custom Colors */
 :root {
@@ -18,9 +20,6 @@
   --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
   --shadow-lg: 0 10px 24px rgba(0,0,0,0.1);
-}
-
-@theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
   --color-brand: var(--brand);
@@ -3860,6 +3859,14 @@ body.otp-page {
   font-size: 13px;
   color: #dc2626;
   margin: 8px 0 0 0;
+}
+
+.checkout-coupon-success {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #059669;
+  margin: 8px 0 0 0;
+  font-weight: 500;
 }
 
 .checkout-coupon-hints {

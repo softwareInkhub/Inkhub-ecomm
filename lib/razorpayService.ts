@@ -174,11 +174,25 @@ class RazorpayService {
       console.log('✅ Razorpay order created:', data.order.id)
       
       return data.order
-    } catch (error) {
-      console.error('Order creation failed:', error)
+    } catch (error: any) {
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('❌ RAZORPAY ORDER CREATION FAILED')
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('Error:', error)
+      console.error('Message:', error?.message || 'Unknown error')
+      console.error('API URL:', apiUrl)
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      
+      // Check if it's a configuration issue
+      if (error?.message?.includes('Razorpay is not configured') || 
+          error?.message?.includes('environment variables')) {
+        console.error('💡 SOLUTION: Set NEXT_PUBLIC_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env.local')
+        throw new Error('Razorpay is not configured. Please check your environment variables.')
+      }
       
       // Fallback: Try to proceed without order_id (less secure but works for testing)
       console.warn('⚠️ Proceeding without order creation (NOT recommended for production)')
+      console.warn('⚠️ This is a fallback mode. Fix the Razorpay configuration for production use.')
       
       return null // Will proceed without order_id
     }

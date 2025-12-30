@@ -55,6 +55,7 @@ export default function TrendsPage() {
       </div>
 
       <main className="trends-content">
+        <div data-section-id="trending">
         <TrendingBanner
           title="ANIME & POP TATTOOS"
           subtitle="EXPRESS YOUR FANDOM"
@@ -70,7 +71,9 @@ export default function TrendsPage() {
           categoryTitle="Anime & Pop Tattoos"
           hideCategoryImage={true}
         />
+        </div>
 
+        <div data-section-id="best-sellers">
         <TrendingBanner
           title="MINIMAL TATTOOS"
           subtitle="LESS IS MORE"
@@ -86,6 +89,7 @@ export default function TrendsPage() {
           categoryTitle="Minimal Tattoos"
           hideCategoryImage={true}
         />
+        </div>
       </main>
 
       <BottomNavbar />

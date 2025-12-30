@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 
+interface Banner {
+  image: string
+  alt: string
+}
+
 const HeroBannerSection: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const isScrollingRef = useRef(false)
-
-  const banners = [
+  const [banners, setBanners] = useState<Banner[]>([
     {
       image: '/images/nature_tattoos.webp',
       alt: 'Nature Tattoos'
@@ -28,7 +30,53 @@ const HeroBannerSection: React.FC = () => {
       image: '/images/samurai_tattoo_2.webp',
       alt: 'Samurai Tattoos'
     }
-  ]
+  ])
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const isScrollingRef = useRef(false)
+
+  // Load banners from config
+  useEffect(() => {
+    const loadBanners = async () => {
+      try {
+        const response = await fetch('/api/config/homepage')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.heroBanners && Array.isArray(data.heroBanners) && data.heroBanners.length > 0) {
+            // Filter out banners with empty images
+            const validBanners = data.heroBanners.filter((b: Banner) => b.image && b.image.trim() !== '')
+            if (validBanners.length > 0) {
+              setBanners(validBanners)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading banner config:', error)
+        // Keep default banners on error
+      }
+    }
+    
+    loadBanners()
+  }, [])
+
+  // Listen for admin preview updates
+  useEffect(() => {
+    const handleAdminUpdate = (event: CustomEvent) => {
+      const { sectionId, data } = event.detail
+      if (sectionId === 'hero-banners' || sectionId === 'homepage') {
+        if (data.heroBanners && Array.isArray(data.heroBanners)) {
+          const validBanners = data.heroBanners.filter((b: Banner) => b.image && b.image.trim() !== '')
+          if (validBanners.length > 0) {
+            setBanners(validBanners)
+          }
+        }
+      }
+    }
+
+    window.addEventListener('adminPreviewUpdate', handleAdminUpdate as EventListener)
+    return () => {
+      window.removeEventListener('adminPreviewUpdate', handleAdminUpdate as EventListener)
+    }
+  }, [])
 
   // Triple the banners for seamless infinite scroll
   const duplicatedBanners = [...banners, ...banners, ...banners]
@@ -110,7 +158,7 @@ const HeroBannerSection: React.FC = () => {
       >
         {duplicatedBanners.map((banner, idx) => (
           <div 
-            key={idx} 
+            key={`banner-${idx}-${banner.image}`} 
             className={`
               relative 
               ${idx === currentIndex ? 'active' : ''}

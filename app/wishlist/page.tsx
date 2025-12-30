@@ -270,9 +270,9 @@ export default function WishlistPage() {
               >
                 All
               </button>
-              {availableCategories.map(category => (
+              {availableCategories.map((category, index) => (
                 <button 
-                  key={category}
+                  key={`category-${index}-${category}`}
                   className={`filter-btn ${activeFilter === category ? 'active' : ''}`} 
                   onClick={() => setActiveFilter(category)}
                 >

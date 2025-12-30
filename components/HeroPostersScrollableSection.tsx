@@ -88,7 +88,7 @@ const HeroPostersScrollableSection: React.FC = () => {
       >
         {duplicatedPosters.map((poster, idx) => (
           <div 
-            key={idx} 
+            key={`poster-${idx}-${poster}`} 
             className="animate-[slideIn_0.5s_ease-out]"
             style={{
               /* .hero-poster from CSS */

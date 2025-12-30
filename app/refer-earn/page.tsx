@@ -47,7 +47,7 @@ export default function ReferEarnPage() {
 
       <main className="refer-main-v2">
         {/* Referral Banner */}
-        <div className="refer-banner">
+        <div data-section-id="invite" className="refer-banner">
           <div className="refer-banner-bg">
             <div className="refer-starburst"></div>
           </div>
@@ -133,7 +133,7 @@ export default function ReferEarnPage() {
         </div>
 
         {/* Summary */}
-        <div className="refer-summary-card">
+        <div data-section-id="rewards" className="refer-summary-card">
           <h3 className="refer-section-title">Summary</h3>
           <div className="refer-summary-item">
             <div className="refer-summary-label">

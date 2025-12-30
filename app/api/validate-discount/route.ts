@@ -1,224 +1,179 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { code, cartTotal } = body
+    const { code, cartTotal } = await request.json();
 
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📥 DISCOUNT VALIDATION REQUEST')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📝 Code:', code)
-    console.log('💰 Cart Total:', cartTotal)
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
-    if (!code) {
+    if (!code || !code.trim()) {
       return NextResponse.json(
-        { success: false, error: 'Discount code is required' },
+        { success: false, valid: false, error: "Discount code is required" },
         { status: 400 }
-      )
+      );
     }
 
-    if (!process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || !process.env.SHOPIFY_ADMIN_ACCESS_TOKEN) {
-      console.error('❌ Shopify credentials missing')
+    const storeUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL?.replace(/^https?:\/\//, "");
+    const adminToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+    const apiVersion = process.env.SHOPIFY_API_VERSION || "2024-01";
+
+    if (!storeUrl || !adminToken) {
       return NextResponse.json(
-        { success: false, error: 'Shopify not configured' },
+        { success: false, valid: false, error: "Shopify credentials missing" },
         { status: 500 }
-      )
+      );
     }
 
-    const storeUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL.replace(/^https?:\/\//, '')
-    const apiVersion = process.env.SHOPIFY_API_VERSION || '2024-01'
-    const shopifyUrl = `https://${storeUrl}/admin/api/${apiVersion}/price_rules.json`
+    // ----------------------------
+    // STEP 1 — LOOKUP DISCOUNT CODE
+    // ----------------------------
 
-    const requestHeaders = {
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': process.env.SHOPIFY_ADMIN_ACCESS_TOKEN,
+    const lookupUrl = `https://${storeUrl}/admin/api/${apiVersion}/discount_codes/lookup.json?code=${encodeURIComponent(
+      code
+    )}`;
+
+    const lookupRes = await fetch(lookupUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": adminToken,
+      },
+    });
+
+    if (lookupRes.status === 404) {
+      return NextResponse.json({
+        success: false,
+        valid: false,
+        error: "Invalid discount code",
+      });
     }
 
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('🔍 FETCHING PRICE RULES FROM SHOPIFY')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📍 Request URL:', shopifyUrl)
-    console.log('🏪 Store:', storeUrl)
-    console.log('📋 API Version:', apiVersion)
-    console.log('🔑 Token:', process.env.SHOPIFY_ADMIN_ACCESS_TOKEN ? `${process.env.SHOPIFY_ADMIN_ACCESS_TOKEN.substring(0, 10)}...` : 'MISSING')
-    console.log('📦 Method: GET')
-    console.log('📋 Headers:', {
-      'Content-Type': requestHeaders['Content-Type'],
-      'X-Shopify-Access-Token': requestHeaders['X-Shopify-Access-Token'] ? `${requestHeaders['X-Shopify-Access-Token'].substring(0, 10)}...` : 'MISSING'
-    })
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
-    // Fetch price rules from Shopify
-    const priceRulesResponse = await fetch(shopifyUrl, {
-      method: 'GET',
-      headers: requestHeaders,
-    })
-
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📡 SHOPIFY PRICE RULES RESPONSE')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📊 Status:', priceRulesResponse.status, priceRulesResponse.statusText)
-    console.log('✅ Response OK:', priceRulesResponse.ok)
-    console.log('📋 Response Headers:', Object.fromEntries(priceRulesResponse.headers.entries()))
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
-    if (!priceRulesResponse.ok) {
-      const errorText = await priceRulesResponse.text()
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('❌ SHOPIFY API ERROR')
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('📊 Status:', priceRulesResponse.status)
-      console.error('📝 Response Body:', errorText)
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      throw new Error(`Shopify API returned ${priceRulesResponse.status}: ${errorText}`)
+    if (!lookupRes.ok) {
+      return NextResponse.json(
+        { success: false, valid: false, error: "Failed to check discount code" },
+        { status: 500 }
+      );
     }
 
-    const priceRulesData = await priceRulesResponse.json()
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('✅ PRICE RULES RESPONSE DATA')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📊 Total Price Rules:', priceRulesData.price_rules?.length || 0)
-    console.log('📦 Response Data (first 3 rules):', JSON.stringify(
-      priceRulesData.price_rules?.slice(0, 3).map((rule: any) => ({
-        id: rule.id,
-        title: rule.title,
-        value_type: rule.value_type,
-        value: rule.value,
-        starts_at: rule.starts_at,
-        ends_at: rule.ends_at,
-        status: rule.status
-      })),
-      null,
-      2
-    ))
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    const lookupData = await lookupRes.json();
+    const discountCode = lookupData.discount_code;
 
-    // Find active price rules
-    const now = new Date()
-    const activePriceRules = priceRulesData.price_rules?.filter((rule: any) => {
-      const startDate = new Date(rule.starts_at)
-      const endDate = rule.ends_at ? new Date(rule.ends_at) : null
-      return startDate <= now && (!endDate || endDate >= now)
-    }) || []
+    if (!discountCode || !discountCode.price_rule_id) {
+      return NextResponse.json({
+        success: false,
+        valid: false,
+        error: "Invalid discount code",
+      });
+    }
 
-    console.log(`🔍 Found ${activePriceRules.length} active price rules`)
+    // ❗ IMPORTANT: Do NOT check discountCode.status — REST API often returns null.
+    // Only price rule determines validity.
 
-    // Fetch all discount codes in parallel for better performance
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('⚡ FETCHING ALL DISCOUNT CODES IN PARALLEL')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log(`📊 Fetching discount codes for ${activePriceRules.length} price rules...`)
+    // --------------------------------------
+    // STEP 2 — FETCH PRICE RULE FOR THE CODE
+    // --------------------------------------
 
-    const discountCodePromises = activePriceRules.map(async (priceRule: any) => {
-      const discountCodesUrl = `https://${storeUrl}/admin/api/${apiVersion}/price_rules/${priceRule.id}/discount_codes.json`
-      
-      try {
-        const discountCodesResponse = await fetch(discountCodesUrl, {
-          method: 'GET',
-          headers: requestHeaders,
-        })
+    const priceRuleUrl = `https://${storeUrl}/admin/api/${apiVersion}/price_rules/${discountCode.price_rule_id}.json`;
 
-        if (!discountCodesResponse.ok) {
-          const errorText = await discountCodesResponse.text()
-          console.error(`❌ Failed to fetch discount codes for price rule ${priceRule.id} (${priceRule.title}):`, errorText)
-          return { priceRule, discountCodes: [], error: true }
-        }
+    const prRes = await fetch(priceRuleUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": adminToken,
+      },
+    });
 
-        const discountCodesData = await discountCodesResponse.json()
-        const codes = discountCodesData.discount_codes || []
-        
-        console.log(`✅ Price Rule ${priceRule.id} (${priceRule.title}): Found ${codes.length} codes - [${codes.map((dc: any) => dc.code).join(', ') || 'None'}]`)
+    if (!prRes.ok) {
+      return NextResponse.json(
+        { success: false, valid: false, error: "Failed to fetch discount details" },
+        { status: 500 }
+      );
+    }
 
-        return { priceRule, discountCodes: codes, error: false }
-      } catch (error: any) {
-        console.error(`❌ Error fetching discount codes for price rule ${priceRule.id}:`, error.message)
-        return { priceRule, discountCodes: [], error: true }
-      }
-    })
+    const prData = await prRes.json();
+    const rule = prData.price_rule;
 
-    // Wait for all requests to complete in parallel
-    const discountCodeResults = await Promise.all(discountCodePromises)
-    
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('✅ ALL DISCOUNT CODES FETCHED')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    if (!rule) {
+      return NextResponse.json({
+        success: false,
+        valid: false,
+        error: "Discount rule not found",
+      });
+    }
 
-    // Search for matching code across all results
-    const searchCodeUpper = code.toUpperCase()
-    for (const result of discountCodeResults) {
-      if (result.error) continue
+    // ----------------------------
+    // VALIDATE PRICE RULE ONLY
+    // ----------------------------
 
-      const matchingCode = result.discountCodes.find(
-        (dc: any) => dc.code.toUpperCase() === searchCodeUpper
-      )
+    const now = new Date();
 
-      if (matchingCode) {
-        const priceRule = result.priceRule
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log('✅ MATCH FOUND!')
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log(`📋 Price Rule: ${priceRule.title} (ID: ${priceRule.id})`)
-        console.log(`📝 Discount Code: ${matchingCode.code}`)
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    if (new Date(rule.starts_at) > now) {
+      return NextResponse.json({
+        success: false,
+        valid: false,
+        error: "This discount code is not active yet",
+      });
+    }
 
-        // Calculate discount amount
-        let discountAmount = 0
+    if (rule.ends_at && new Date(rule.ends_at) < now) {
+      return NextResponse.json({
+        success: false,
+        valid: false,
+        error: "This discount code has expired",
+      });
+    }
 
-        if (priceRule.value_type === 'fixed_amount') {
-          discountAmount = Math.abs(parseFloat(priceRule.value))
-        } else if (priceRule.value_type === 'percentage') {
-          const percentage = Math.abs(parseFloat(priceRule.value))
-          discountAmount = (cartTotal * percentage) / 100
-        }
+    if (rule.usage_limit && rule.usage_count >= rule.usage_limit) {
+      return NextResponse.json({
+        success: false,
+        valid: false,
+        error: "This discount code has reached its usage limit",
+      });
+    }
 
-        // Check minimum purchase requirement
-        if (priceRule.prerequisite_subtotal_range?.greater_than_or_equal_to) {
-          const minAmount = parseFloat(priceRule.prerequisite_subtotal_range.greater_than_or_equal_to)
-          if (cartTotal < minAmount) {
-            console.log(`❌ Cart total (₹${cartTotal}) is less than minimum (₹${minAmount})`)
-            return NextResponse.json({
-              success: false,
-              valid: false,
-              error: `Minimum purchase of ₹${minAmount} required for this coupon`,
-            })
-          }
-        }
-
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log('✅ COUPON VALIDATION SUCCESS')
-        console.log(`💰 Discount Amount: ₹${discountAmount}`)
-        console.log(`📊 Discount Type: ${priceRule.value_type}`)
-        console.log(`📈 Discount Value: ${priceRule.value}`)
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
+    // Minimum purchase
+    if (rule.prerequisite_subtotal_range?.greater_than_or_equal_to) {
+      const min = parseFloat(rule.prerequisite_subtotal_range.greater_than_or_equal_to);
+      if (cartTotal < min) {
         return NextResponse.json({
-          success: true,
-          valid: true,
-          code: matchingCode.code,
-          discountAmount: Math.min(discountAmount, cartTotal),
-          discountType: priceRule.value_type,
-          discountValue: priceRule.value,
-          priceRuleId: priceRule.id,
-          title: priceRule.title,
-        })
+          success: false,
+          valid: false,
+          error: `Minimum order of ₹${min} required`,
+        });
       }
     }
 
-    // Code not found
-    console.log('❌ Discount code not found')
+    // ----------------------------
+    // CALCULATE DISCOUNT
+    // ----------------------------
+
+    let discountAmount = 0;
+
+    if (rule.value_type === "fixed_amount") {
+      discountAmount = Math.abs(parseFloat(rule.value));
+    } else if (rule.value_type === "percentage") {
+      const pct = Math.abs(parseFloat(rule.value));
+      discountAmount = (cartTotal * pct) / 100;
+    }
+
+    discountAmount = Math.min(discountAmount, cartTotal);
+
+    // ----------------------------
+    // SUCCESS RESPONSE
+    // ----------------------------
+
     return NextResponse.json({
-      success: false,
-      valid: false,
-      error: 'Invalid discount code',
-    })
+      success: true,
+      valid: true,
+      code: discountCode.code,
+      discountAmount,
+      discountType: rule.value_type,
+      discountValue: rule.value,
+      priceRuleId: rule.id,
+      title: rule.title,
+    });
   } catch (error: any) {
-    console.error('Validate discount error:', error)
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to validate discount code' },
+      { success: false, valid: false, error: error.message },
       { status: 500 }
-    )
+    );
   }
 }
-

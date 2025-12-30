@@ -61,52 +61,106 @@ export default function CategoriesPage() {
     return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3C/svg%3E'
   }
 
-  const mainCategories = [
-    { 
-      id: 'all-tattoos', 
-      name: 'All Tattoos'
-    },
-    { 
-      id: 'spiritual', 
-      name: 'Spiritual Collection'
-    },
-    { 
-      id: 'love-couple', 
-      name: 'Love & Couple Tattoos'
-    },
-    { 
-      id: 'anime-pop', 
-      name: 'Anime & Pop Tattoos'
-    },
-    { 
-      id: 'animal', 
-      name: 'Animal Tattoos'
-    },
-    { 
-      id: 'minimal', 
-      name: 'Minimal Tattoos'
-    },
-    { 
-      id: 'bold-dark', 
-      name: 'Bold & Dark Tattoos'
-    },
-    { 
-      id: 'tattoo-packs', 
-      name: 'Tattoos Packs'
-    },
-    { 
-      id: 'body-placement', 
-      name: 'Body Placement Tattoos'
-    },
-    { 
-      id: 'lifestyle', 
-      name: 'Lifestyle Tattoos'
-    },
-    { 
-      id: 'size-type', 
-      name: 'Tattoos Size & Type'
+  const [categoryOrder, setCategoryOrder] = useState<string[]>([])
+  const [hiddenPositions, setHiddenPositions] = useState<number[]>([])
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+
+  // Load category order from config.json
+  useEffect(() => {
+    const loadCategoryOrder = async () => {
+      try {
+        const response = await fetch('/api/config/categories')
+        if (response.ok) {
+          const data = await response.json()
+          // Use order array if available, otherwise fall back to enabled array
+          const order = data?.order || data?.enabled || []
+          const hidden = data?.hiddenPositions || []
+          setCategoryOrder(order)
+          setHiddenPositions(hidden)
+          setCategoriesLoaded(true)
+        }
+      } catch (error) {
+        console.error('Error loading category order:', error)
+        // Fallback to default order
+        setCategoryOrder([
+          'All Tattoos',
+          'Spiritual Collection',
+          'Love & Couple Tattoos',
+          'Anime & Pop Tattoos',
+          'Animal Tattoos',
+          'Minimal Tattoos',
+          'Bold & Dark Tattoos',
+          'Tattoos Packs',
+          'Body Placement Tattoos',
+          'Lifestyle Tattoos',
+          'Tattoos Size & Type'
+        ])
+        setHiddenPositions([])
+        setCategoriesLoaded(true)
+      }
     }
-  ]
+    loadCategoryOrder()
+  }, [])
+
+  // Listen for admin preview updates
+  useEffect(() => {
+    const handleAdminUpdate = (event: CustomEvent) => {
+      const { sectionId, data } = event.detail
+      if (sectionId === 'categories') {
+        if (data.order && Array.isArray(data.order)) {
+          setCategoryOrder(data.order)
+        }
+        if (data.hiddenPositions && Array.isArray(data.hiddenPositions)) {
+          setHiddenPositions(data.hiddenPositions)
+        }
+      }
+    }
+
+    window.addEventListener('adminPreviewUpdate', handleAdminUpdate as EventListener)
+    return () => {
+      window.removeEventListener('adminPreviewUpdate', handleAdminUpdate as EventListener)
+    }
+  }, [])
+
+  // Map category names to IDs
+  const categoryNameToId = (name: string): string => {
+    const mapping: Record<string, string> = {
+      'All Tattoos': 'all-tattoos',
+      'Spiritual Collection': 'spiritual',
+      'Love & Couple Tattoos': 'love-couple',
+      'Anime & Pop Tattoos': 'anime-pop',
+      'Animal Tattoos': 'animal',
+      'Minimal Tattoos': 'minimal',
+      'Bold & Dark Tattoos': 'bold-dark',
+      'Tattoos Packs': 'tattoo-packs',
+      'Body Placement Tattoos': 'body-placement',
+      'Lifestyle Tattoos': 'lifestyle',
+      'Tattoos Size & Type': 'size-type'
+    }
+    return mapping[name] || name.toLowerCase().replace(/\s+/g, '-')
+  }
+
+  // Build mainCategories from order array, filtering out hidden positions
+  const mainCategories = categoryOrder.length > 0 && categoriesLoaded
+    ? categoryOrder
+        .filter((name, index) => !hiddenPositions.includes(index))
+        .map(name => ({
+          id: categoryNameToId(name),
+          name: name
+        }))
+    : [
+        { id: 'all-tattoos', name: 'All Tattoos' },
+        { id: 'spiritual', name: 'Spiritual Collection' },
+        { id: 'love-couple', name: 'Love & Couple Tattoos' },
+        { id: 'anime-pop', name: 'Anime & Pop Tattoos' },
+        { id: 'animal', name: 'Animal Tattoos' },
+        { id: 'minimal', name: 'Minimal Tattoos' },
+        { id: 'bold-dark', name: 'Bold & Dark Tattoos' },
+        { id: 'tattoo-packs', name: 'Tattoos Packs' },
+        { id: 'body-placement', name: 'Body Placement Tattoos' },
+        { id: 'lifestyle', name: 'Lifestyle Tattoos' },
+        { id: 'size-type', name: 'Tattoos Size & Type' }
+      ]
 
   // Group products by category
   const getProductsByCategory = (categoryName: string) => {
@@ -261,7 +315,8 @@ export default function CategoriesPage() {
               <p>Loading products...</p>
             </div>
           ) : (
-            mainCategories.map((category, index) => {
+            <div data-section-id="category-list">
+              {mainCategories.map((category, index) => {
               const categoryProducts = getProductsByCategory(category.name)
               return (
                 <div
@@ -302,7 +357,8 @@ export default function CategoriesPage() {
                   </div>
                 </div>
               )
-            })
+              })}
+            </div>
           )}
         </main>
       </div>

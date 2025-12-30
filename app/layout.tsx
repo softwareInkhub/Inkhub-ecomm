@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import AdminPreviewHighlighter from "@/components/AdminPreviewHighlighter";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,7 +31,8 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </head>
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`} suppressHydrationWarning>
+        <AdminPreviewHighlighter />
         <div className="app-container">
           {children}
         </div>

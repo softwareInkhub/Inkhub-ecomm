@@ -212,7 +212,7 @@ export default function DatePickerModal({ isOpen, onClose, selectedDate, onDateS
                 const isDisabled = date.year === currentYear && index > currentMonth
                 return (
                   <div
-                    key={month}
+                    key={`month-${index}`}
                     className={`wheel-item ${isDisabled ? 'disabled' : ''}`}
                     data-value={index}
                   >
@@ -231,11 +231,11 @@ export default function DatePickerModal({ isOpen, onClose, selectedDate, onDateS
               aria-label="Day selector"
             >
               <div className="wheel-spacer"></div>
-              {days.map((day) => {
+              {days.map((day, index) => {
                 const isDisabled = date.year === currentYear && date.month === currentMonth && day > currentDay
                 return (
                   <div
-                    key={day}
+                    key={`day-${index}-${day}`}
                     className={`wheel-item ${isDisabled ? 'disabled' : ''}`}
                     data-value={day}
                   >
@@ -256,7 +256,7 @@ export default function DatePickerModal({ isOpen, onClose, selectedDate, onDateS
               <div className="wheel-spacer"></div>
               {years.map((year, index) => (
                 <div
-                  key={year}
+                  key={`year-${index}`}
                   className="wheel-item"
                   data-value={index}
                 >

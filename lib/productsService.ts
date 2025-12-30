@@ -6,8 +6,6 @@
 
 import type { Product } from '@/types'
 
-const API_URL = 'https://brmh.in/cache/data?project=my-app&table=shopify-inkhub-get-products&key=chunk:0'
-
 interface ShopifyProduct {
   id?: number
   handle: string
@@ -31,29 +29,48 @@ export const fetchProducts = async (): Promise<Product[]> => {
   }
 
   try {
-    const response = await fetch(API_URL)
+    // Use server-side proxy API route to avoid CORS and rate limit issues
+    const response = await fetch('/api/products', { 
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
     const result = await response.json()
     
-    if (result.data && Array.isArray(result.data)) {
+    // Handle both { data: [...] } and direct array formats
+    const productsData = (result?.data && Array.isArray(result.data)) 
+      ? result.data 
+      : (Array.isArray(result) ? result : [])
+    
+    if (productsData.length > 0) {
       // First pass: categorize products
-      const categorizedProducts = result.data.map((product: ShopifyProduct, index: number) => ({
-        id: product.id?.toString() || product.handle,
-        handle: product.handle,
-        title: product.title,
-        name: product.title,
-        desc: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 50) : product.title,
-        description: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 200) : product.title,
-        price: product.variants && product.variants[0] ? parseFloat(product.variants[0].price) : 0,
-        image: product.images && product.images[0] ? product.images[0].src : '',
-        images: product.images ? product.images.map(img => img.src) : [],
-        category: extractCategory(product.tags || '', index),
-        tags: product.tags || '',
-        fabric: 'Temporary Tattoo',
-        pattern: extractPattern(product.tags || ''),
-        fit: extractSize(product.tags || ''),
-        occasion: 'Body Art',
-        inStock: true,
-      }))
+      const categorizedProducts = productsData
+        .filter((product: ShopifyProduct) => product && product.handle && product.title) // Filter invalid products
+        .map((product: ShopifyProduct, index: number) => ({
+          id: product.id?.toString() || product.handle || '',
+          handle: product.handle || '',
+          title: product.title || 'Untitled Product',
+          name: product.title || 'Untitled Product',
+          desc: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 50) : (product.title || ''),
+          description: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 200) : (product.title || ''),
+          price: product.variants && product.variants[0] ? (parseFloat(product.variants[0].price) || 0) : 0,
+          image: (product.images && product.images[0] && product.images[0].src) || '',
+          images: (product.images && Array.isArray(product.images)) ? product.images.map((img: any) => img?.src || '').filter(Boolean) : [],
+          category: extractCategory(product.tags || '', index),
+          tags: product.tags || '',
+          fabric: 'Temporary Tattoo',
+          pattern: extractPattern(product.tags || ''),
+          fit: extractSize(product.tags || ''),
+          occasion: 'Body Art',
+          inStock: true,
+        }))
+        .filter((p: Product) => p.id && p.title) // Ensure required fields exist
       
       // Ensure each category has at least some products
       cachedProducts = ensureCategoryDistribution(categorizedProducts)
@@ -64,6 +81,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
     return []
   } catch (error) {
     console.error('Error fetching products:', error)
+    // Return empty array on error to prevent UI crashes
     return []
   }
 }

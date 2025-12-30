@@ -127,7 +127,7 @@ const HeroGridSection: React.FC = () => {
             <div className="hero-grid">
               {gridItems.map((item, itemIdx) => (
                 <div 
-                  key={itemIdx} 
+                  key={`${gridIdx}-${itemIdx}-${item.name}`} 
                   className="hero-card"
                   onClick={() => handleCategoryClick(item.name)}
                 >

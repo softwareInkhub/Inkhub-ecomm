@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import shopifyService from '@/lib/shopifyService'
 import type { CartItem, Address } from '@/types'
+import { applyDiscountToCart, recalculateDiscount, formatDiscountMessage, type AppliedDiscount } from '@/lib/discountEngine'
 import AddressSelectionModal from '@/components/AddressSelectionModal'
 import MapLocationPicker from '@/components/MapLocationPicker'
 
@@ -11,10 +11,11 @@ export default function CheckoutPage() {
   const router = useRouter()
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [quantities, setQuantities] = useState<Record<string, number>>({})
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedDiscount | null>(null)
   const [couponCode, setCouponCode] = useState('')
   const [couponError, setCouponError] = useState('')
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false)
+  const [couponSuccess, setCouponSuccess] = useState('')
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [showMapPicker, setShowMapPicker] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
@@ -66,27 +67,34 @@ export default function CheckoutPage() {
     }
   }, [router])
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce((sum, item) => {
-      const qty = quantities[item.id] || item.quantity || 1
-      return sum + (parseFloat(String(item.price || 0)) * qty)
-    }, 0)
-  }
-
-  const calculateCouponDiscount = () => {
-    if (appliedCoupon && appliedCoupon.discountAmount) {
-      return appliedCoupon.discountAmount
+  // Recalculate discount when quantities or cart items change
+  useEffect(() => {
+    if (appliedCoupon && cartItems.length > 0) {
+      const recalculated = recalculateDiscount(cartItems, quantities, appliedCoupon, 0)
+      if (recalculated) {
+        setAppliedCoupon(recalculated)
+        localStorage.setItem('appliedCoupon', JSON.stringify(recalculated))
+      } else {
+        // Discount no longer valid (e.g., minimum not met)
+        setAppliedCoupon(null)
+        localStorage.removeItem('appliedCoupon')
+        setCouponError('Discount no longer applicable to your cart')
+      }
     }
-    return 0
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quantities, cartItems.length])
 
+  // Calculate totals using discount engine
   const deliveryFee = 0 // Free delivery
-  const subtotal = calculateSubtotal()
-  const discount = calculateCouponDiscount()
-  const total = Math.max(0, subtotal - discount + deliveryFee) // Ensure total doesn't go negative
+  const totals = useMemo(() => {
+    return applyDiscountToCart(cartItems, quantities, appliedCoupon, deliveryFee)
+  }, [cartItems, quantities, appliedCoupon, deliveryFee])
+
+  const { subtotal, discount, total } = totals
 
   const handleApplyCoupon = async () => {
     setCouponError('')
+    setCouponSuccess('')
     const code = couponCode.trim().toUpperCase()
     
     if (!code) {
@@ -97,28 +105,50 @@ export default function CheckoutPage() {
     setIsValidatingCoupon(true)
 
     try {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('🎫 FRONTEND: Validating Coupon')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('📝 Code:', code)
-      console.log('💰 Cart Subtotal:', subtotal)
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      
-      // Validate coupon with Shopify
-      const validation = await shopifyService.validateDiscountCode(code, subtotal)
-      
-      console.log('📡 FRONTEND: Got validation response:', validation)
-      
-      if (validation.valid) {
-        const couponData = {
-          code: validation.code,
-          discountAmount: validation.discountAmount,
-          discountType: validation.discountType,
-          discountValue: validation.discountValue,
-          title: validation.title,
-          priceRuleId: validation.priceRuleId,
-          fallback: validation.fallback,
+      // Prepare cart items for validation
+      const cartItemsForValidation = cartItems.map(item => ({
+        id: item.id,
+        price: parseFloat(String(item.price || 0)),
+        quantity: quantities[item.id] || item.quantity || 1,
+        title: item.title || item.name,
+        variantId: item.variantId,
+      }))
+
+      // Call the new check-discount API endpoint
+      const response = await fetch('/api/check-discount', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code,
+          cartItems: cartItemsForValidation,
+          cartTotal: subtotal,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.valid) {
+        // Ensure discount amount is always positive
+        const discountAmount = Math.abs(parseFloat(String(data.discountAmount || 0)))
+        
+        const couponData: AppliedDiscount = {
+          code: data.code,
+          discountAmount: discountAmount,
+          discountType: data.discountType,
+          discountValue: Math.abs(parseFloat(String(data.discountValue || 0))),
+          priceRuleId: data.priceRuleId,
+          title: data.title,
+          priceRule: data.priceRule,
         }
+        
+        console.log('✅ Coupon applied:', {
+          code: couponData.code,
+          discountAmount: couponData.discountAmount,
+          discountType: couponData.discountType,
+          discountValue: couponData.discountValue,
+        })
         
         setAppliedCoupon(couponData)
         localStorage.setItem('appliedCoupon', JSON.stringify(couponData))
@@ -126,17 +156,16 @@ export default function CheckoutPage() {
         setCouponError('')
         
         // Show success message
-        if (validation.fallback) {
-          console.log('✅ Coupon applied (fallback mode):', validation.code)
-        } else {
-          console.log('✅ Coupon validated from Shopify:', validation.code)
-        }
+        const discountMsg = formatDiscountMessage(couponData)
+        setCouponSuccess(`Code applied successfully: ${discountMsg}`)
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setCouponSuccess(''), 5000)
       } else {
-        console.log('❌ FRONTEND: Validation failed:', validation.error)
-        setCouponError(validation.error || 'Invalid coupon code')
+        setCouponError(data.error || 'Invalid discount code')
       }
     } catch (error) {
-      console.error('❌ FRONTEND: Error validating coupon:', error)
+      console.error('❌ Error validating coupon:', error)
       setCouponError('Failed to validate coupon. Please try again.')
     } finally {
       setIsValidatingCoupon(false)
@@ -148,6 +177,7 @@ export default function CheckoutPage() {
     localStorage.removeItem('appliedCoupon')
     setCouponCode('')
     setCouponError('')
+    setCouponSuccess('')
   }
 
   const handleQuantityChange = (itemId: string, change: number) => {
@@ -304,13 +334,14 @@ export default function CheckoutPage() {
               <button 
                 className="checkout-coupon-apply-btn" 
                 onClick={handleApplyCoupon}
-                disabled={isValidatingCoupon}
+                disabled={isValidatingCoupon || !couponCode.trim()}
               >
-                {isValidatingCoupon ? 'Validating...' : 'Apply'}
+                {isValidatingCoupon ? 'Checking...' : 'Apply'}
               </button>
             </div>
           )}
           {couponError && <p className="checkout-coupon-error">{couponError}</p>}
+          {couponSuccess && <p className="checkout-coupon-success">{couponSuccess}</p>}
           {!appliedCoupon && (
             <div className="checkout-coupon-hints">
               <p>💡 <strong>Available coupons:</strong> Ask support for discount codes or check your email for exclusive offers!</p>
@@ -325,9 +356,9 @@ export default function CheckoutPage() {
             <span>Subtotal</span>
             <span>₹{subtotal.toFixed(0)}</span>
           </div>
-          {discount > 0 && (
+          {discount > 0 && appliedCoupon && (
             <div className="checkout-summary-row-v2 discount-row">
-              <span>Discount ({appliedCoupon?.code || 'Applied'})</span>
+              <span>Discount ({appliedCoupon.code})</span>
               <span className="discount-amount">-₹{discount.toFixed(0)}</span>
             </div>
           )}
