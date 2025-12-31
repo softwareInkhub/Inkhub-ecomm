@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import gokwikService from '@/lib/gokwikService'
 import razorpayService from '@/lib/razorpayService'
-import shopifyService from '@/lib/shopifyService'
 import type { CartItem, Address } from '@/types'
 import {
   getCustomerDetails,
@@ -200,21 +199,30 @@ export default function PaymentPage() {
       status: 'confirmed'
     }
 
-    // Create order in Shopify
+    // Create order in Shopify via API
     try {
-      const shopifyOrder = await shopifyService.createOrder({
-        customer: customerDetails,
-        items: cartItems,
-        shippingAddress: address,
-        total: total,
-        orderId: orderDetails.orderId,
-        paymentDetails: paymentData
+      const shopifyResponse = await fetch('/api/create-shopify-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customer: customerDetails,
+          items: cartItems,
+          shippingAddress: address,
+          total: total,
+          orderId: orderDetails.orderId,
+          paymentDetails: paymentData
+        }),
       })
-      
-      if (shopifyOrder) {
-        console.log('Order created in Shopify:', shopifyOrder.id)
-        orderDetails.shopifyOrderId = shopifyOrder.id
-        orderDetails.shopifyOrderNumber = shopifyOrder.order_number
+
+      if (shopifyResponse.ok) {
+        const shopifyOrder = await shopifyResponse.json()
+        if (shopifyOrder && shopifyOrder.id) {
+          console.log('Order created in Shopify:', shopifyOrder.id)
+          orderDetails.shopifyOrderId = shopifyOrder.id
+          orderDetails.shopifyOrderNumber = shopifyOrder.order_number
+        }
       }
     } catch (error) {
       console.error('Failed to create order in Shopify:', error)

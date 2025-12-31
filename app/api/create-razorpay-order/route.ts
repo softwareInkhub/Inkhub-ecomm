@@ -19,6 +19,9 @@ export async function POST(request: NextRequest) {
   try {
     // Check if Razorpay is configured
     if (!razorpayKeyId || !razorpayKeySecret) {
+      console.error('❌ Razorpay credentials missing in request!')
+      console.error('Key ID:', razorpayKeyId ? '✅' : '❌ Missing')
+      console.error('Key Secret:', razorpayKeySecret ? '✅' : '❌ Missing')
       return NextResponse.json(
         { success: false, error: 'Razorpay is not configured. Please check environment variables.' },
         { status: 500 }
@@ -61,7 +64,8 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error: any) {
-    console.error('Create order error:', error)
+    console.error('❌ Create order error:', error.message || error)
+    console.error('Error details:', error.response?.data || error.statusCode || 'Unknown')
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to create order' },
       { status: 500 }
