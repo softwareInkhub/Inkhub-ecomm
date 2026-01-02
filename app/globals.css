@@ -17,14 +17,14 @@
   --accent-light: #f87171;
   --border: #e2e8f0;
   --card-bg: #ffffff;
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
-  --shadow-lg: 0 10px 24px rgba(0,0,0,0.1);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1);
   --color-background: var(--bg);
   --color-foreground: var(--text);
   --color-brand: var(--brand);
   --color-accent: var(--accent);
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -33,7 +33,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -47,13 +48,13 @@ body::-webkit-scrollbar {
 /* Hide scrollbar for IE, Edge and Firefox */
 html,
 body {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.5;
@@ -204,7 +205,7 @@ button {
   border: 1px solid #e5e7eb;
   color: var(--text);
   border-radius: 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
   font-size: 15px;
   transition: all 0.2s;
@@ -259,7 +260,7 @@ button {
 
 .see-all-categories-text {
   text-align: center;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
@@ -328,7 +329,7 @@ button {
 }
 
 .wishlist-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 28px;
   font-weight: 500;
   color: #111827;
@@ -386,7 +387,7 @@ button {
 }
 
 .products-items-grid .wishlist-item-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #111827;
@@ -402,7 +403,7 @@ button {
 
 .products-items-grid .wishlist-item-desc {
   margin-bottom: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
   font-weight: 400;
   color: #9ca3af;
@@ -439,7 +440,7 @@ button {
 }
 
 .products-items-grid .wishlist-item-price {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
 }
@@ -544,7 +545,7 @@ button {
   right: 8px;
   width: 32px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.95);
+  background: transparent;
   backdrop-filter: blur(4px);
   border-radius: 50%;
   display: flex;
@@ -554,14 +555,17 @@ button {
   cursor: pointer;
   z-index: 10;
   border: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
-
-.product-wishlist-heart:hover {
+/* .product-wishlist-heart svg {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  background: white;
+} */
+/* .product-wishlist-heart:hover {
   transform: scale(1.05);
-  background: rgba(255, 255, 255, 1);
+  background: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
+} */
 
 .product-wishlist-heart:active {
   transform: scale(0.98);
@@ -572,13 +576,9 @@ button {
   transition: all 0.2s;
 }
 
-.product-wishlist-heart:hover svg {
-  color: #ef4444;
-}
-
 .product-wishlist-heart.active svg {
-  color: #ef4444;
-  fill: #ef4444;
+  color: #fb7d7d;
+  fill: #fb7d7d;
 }
 
 .wishlist-item-info {
@@ -586,7 +586,7 @@ button {
 }
 
 .wishlist-item-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #111827;
@@ -597,7 +597,7 @@ button {
 }
 
 .wishlist-item-desc {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
   font-weight: 400;
   color: #9ca3af;
@@ -629,14 +629,14 @@ button {
 }
 
 .wishlist-item-price {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #111827;
 }
 
 .wishlist-discount-badge {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 9px;
   font-weight: 500;
   color: #3b82f6;
@@ -648,7 +648,7 @@ button {
 }
 
 .wishlist-previous-price {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 11px;
   font-weight: 400;
   color: #9ca3af;
@@ -708,7 +708,7 @@ button {
 }
 
 .categories-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 22px;
   font-weight: 500;
   color: var(--text);
@@ -761,7 +761,7 @@ button {
   border-right: 1px solid rgba(59, 130, 246, 0.1);
   overflow-y: auto;
   padding: 92px 0;
-  flex-shrink: 0; 
+  flex-shrink: 0;
   position: fixed;
   top: 0;
   align-self: flex-start;
@@ -784,7 +784,7 @@ button {
 }
 
 .category-sidebar-item.active::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 50%;
@@ -842,7 +842,7 @@ button {
 }
 
 .category-sidebar-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: var(--text);
@@ -871,7 +871,7 @@ button {
 }
 
 .category-section-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 18px;
   font-weight: 500;
   color: var(--text);
@@ -905,12 +905,16 @@ button {
 }
 
 .subcategory-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 12px;
   padding: 2px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.15));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.15),
+    rgba(59, 130, 246, 0.15)
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -957,7 +961,7 @@ button {
 }
 
 .subcategory-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text);
@@ -1399,7 +1403,8 @@ body.search-page {
 }
 
 @keyframes pulse-mic {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     background: transparent;
   }
@@ -1546,7 +1551,7 @@ body.wishlist-page {
 }
 
 .wishlist-logo {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #111827;
@@ -1574,7 +1579,7 @@ body.wishlist-page {
 }
 
 .wishlist-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 28px;
   font-weight: 500;
   color: #111827;
@@ -1605,7 +1610,7 @@ body.wishlist-page {
   border-radius: 24px;
   background: #ffffff;
   color: #6b7280;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 300;
   font-size: 13px;
   cursor: pointer;
@@ -1642,7 +1647,7 @@ body.wishlist-page {
 }
 
 .empty-state-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 22px;
   font-weight: 500;
   color: #111827;
@@ -1650,7 +1655,7 @@ body.wishlist-page {
 }
 
 .empty-state-text {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: #6b7280;
@@ -1663,7 +1668,7 @@ body.wishlist-page {
   background: #3b82f6;
   color: white;
   border-radius: 26px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
   font-size: 15px;
   transition: all 0.2s;
@@ -1832,7 +1837,7 @@ body.wishlist-page {
 }
 
 .profile-header-title {
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 500;
   color: var(--text);
   flex: 1;
@@ -2267,7 +2272,7 @@ body.wishlist-page {
 }
 
 .contact-modal-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 19px;
   font-weight: 500;
   color: #111827;
@@ -2276,7 +2281,7 @@ body.wishlist-page {
 }
 
 .contact-modal-text {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #6b7280;
@@ -2308,7 +2313,7 @@ body.wishlist-page {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   cursor: pointer;
@@ -2779,7 +2784,8 @@ body.wishlist-page {
   font-weight: 600;
   color: #2d3748;
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   line-height: 1.4;
   letter-spacing: -0.3px;
 }
@@ -2808,7 +2814,8 @@ body.wishlist-page {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Poppins", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   font-weight: 400;
 }
 
@@ -3027,7 +3034,7 @@ body.otp-page {
   border-radius: 12px;
   font-size: 16px;
   color: #1a1a1a;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   transition: all 0.3s;
   outline: none;
 }
@@ -3582,7 +3589,7 @@ body.otp-page {
 }
 
 .checkout-title-v2 {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 24px;
   font-weight: 500;
   color: #111827;
@@ -3599,7 +3606,7 @@ body.otp-page {
   padding: 6px;
   border-radius: 8px;
   color: #9ca3af;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -3666,7 +3673,7 @@ body.otp-page {
 }
 
 .checkout-item-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #111827;
@@ -3730,7 +3737,7 @@ body.otp-page {
 }
 
 .checkout-item-quantity span {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #111827;
@@ -3739,7 +3746,7 @@ body.otp-page {
 }
 
 .checkout-item-price-current {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: #111827;
@@ -3753,7 +3760,7 @@ body.otp-page {
 }
 
 .checkout-coupon-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #111827;
@@ -3771,7 +3778,7 @@ body.otp-page {
   padding: 12px 14px;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   color: #111827;
   background: #f9fafb;
@@ -3794,7 +3801,7 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 10px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -3828,7 +3835,7 @@ body.otp-page {
   align-items: center;
   gap: 8px;
   color: #16a34a;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
 }
@@ -3842,7 +3849,7 @@ body.otp-page {
   border: none;
   padding: 6px 12px;
   color: #dc2626;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -3855,14 +3862,14 @@ body.otp-page {
 }
 
 .checkout-coupon-error {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   color: #dc2626;
   margin: 8px 0 0 0;
 }
 
 .checkout-coupon-success {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   color: #059669;
   margin: 8px 0 0 0;
@@ -3874,7 +3881,7 @@ body.otp-page {
 }
 
 .checkout-coupon-hints p {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
   color: #6b7280;
   margin: 0;
@@ -3894,7 +3901,7 @@ body.otp-page {
 }
 
 .checkout-summary-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #111827;
@@ -3906,7 +3913,7 @@ body.otp-page {
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   color: #6b7280;
 }
@@ -3972,7 +3979,7 @@ body.otp-page {
 }
 
 .checkout-section-title-v2 {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #111827;
@@ -3985,7 +3992,7 @@ body.otp-page {
   padding: 6px 14px;
   border-radius: 8px;
   color: #3b82f6;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -4009,7 +4016,7 @@ body.otp-page {
   background: #3b82f6;
   color: white;
   border-radius: 6px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 11px;
   font-weight: 500;
   margin-bottom: 8px;
@@ -4017,7 +4024,7 @@ body.otp-page {
 }
 
 .checkout-address-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: #111827;
@@ -4025,7 +4032,7 @@ body.otp-page {
 }
 
 .checkout-address-text {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #6b7280;
@@ -4034,7 +4041,7 @@ body.otp-page {
 }
 
 .checkout-address-phone {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: #111827;
@@ -4047,7 +4054,7 @@ body.otp-page {
   border: 2px dashed #d1d5db;
   border-radius: 10px;
   color: #6b7280;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -4324,11 +4331,15 @@ body.otp-page {
 /* Map Location Picker Modal */
 .map-modal-overlay {
   position: fixed;
+  inset: 0;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1001;
   animation: fadeIn 0.3s ease;
 }
@@ -4338,10 +4349,13 @@ body.otp-page {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  max-width: 420px;
 }
 
 .map-modal-header {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
@@ -4366,7 +4380,7 @@ body.otp-page {
 }
 
 .map-modal-title {
-  font-size: 18px;
+  font-size: 25px;
   font-weight: 700;
   color: #1a1a1a;
   margin: 0;
@@ -4385,7 +4399,7 @@ body.otp-page {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: #f9fafb;
+  background: white;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
 }
@@ -4511,7 +4525,8 @@ body.otp-page {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(-50%, -100%);
   }
   50% {
@@ -4596,12 +4611,11 @@ body.otp-page {
 .map-location-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #6366f1;
   flex-shrink: 0;
 }
 
@@ -4626,7 +4640,7 @@ body.otp-page {
 .map-confirm-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+  background: #6366f1;
   color: white;
   border: none;
   border-radius: 12px;
@@ -4698,7 +4712,7 @@ body.otp-page {
   border-radius: 12px;
   font-size: 15px;
   color: #1a1a1a;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   transition: all 0.3s;
   outline: none;
   background: white;
@@ -4737,9 +4751,9 @@ body.otp-page {
 }
 
 .map-address-type-btn.active {
-  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+  background: #6366f1;
   color: white;
-  border-color: #1a1a1a;
+  border: none;
 }
 
 .map-address-form-footer {
@@ -4751,7 +4765,7 @@ body.otp-page {
 .map-save-address-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+  background: #6366f1;
   color: white;
   border: none;
   border-radius: 12px;
@@ -5175,7 +5189,8 @@ body.otp-page {
   padding: 40px;
   border-radius: 16px;
   text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .payment-processing-spinner .spinner {
@@ -5283,7 +5298,7 @@ body.otp-page {
 }
 
 .orders-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 500;
   color: #111827;
@@ -5309,7 +5324,7 @@ body.otp-page {
 }
 
 .orders-empty-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: #333333;
@@ -5317,7 +5332,7 @@ body.otp-page {
 }
 
 .orders-empty-text {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: #666666;
@@ -5332,7 +5347,7 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 24px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   cursor: pointer;
@@ -5373,14 +5388,14 @@ body.otp-page {
 }
 
 .order-id {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #111827;
 }
 
 .order-status {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   text-transform: capitalize;
@@ -5415,7 +5430,7 @@ body.otp-page {
 }
 
 .order-item-name {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #111827;
@@ -5423,7 +5438,7 @@ body.otp-page {
 }
 
 .order-item-qty {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #6b7280;
@@ -5431,7 +5446,7 @@ body.otp-page {
 }
 
 .order-more-items {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #3b82f6;
@@ -5448,7 +5463,7 @@ body.otp-page {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #6b7280;
@@ -5460,7 +5475,7 @@ body.otp-page {
 }
 
 .order-total {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #111827;
@@ -5486,7 +5501,7 @@ body.otp-page {
 }
 
 .refer-title-v2 {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 500;
   color: #111827;
@@ -5524,7 +5539,11 @@ body.otp-page {
   transform: translate(-50%, -50%);
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 70%
+  );
 }
 
 .refer-banner-content {
@@ -5541,7 +5560,7 @@ body.otp-page {
 }
 
 .refer-banner-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 26px;
   font-weight: 600;
   color: white;
@@ -5558,7 +5577,7 @@ body.otp-page {
 }
 
 .refer-banner-subtitle {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 11px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
@@ -5586,7 +5605,7 @@ body.otp-page {
   align-items: center;
   gap: 8px;
   color: white;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 1px;
@@ -5605,7 +5624,7 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 18px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -5627,7 +5646,7 @@ body.otp-page {
 }
 
 .refer-section-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 17px;
   font-weight: 500;
   color: #111827;
@@ -5694,7 +5713,7 @@ body.otp-page {
 }
 
 .refer-step-text p {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #6b7280;
@@ -5724,7 +5743,7 @@ body.otp-page {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: #6b7280;
@@ -5735,7 +5754,7 @@ body.otp-page {
 }
 
 .refer-summary-value {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #10b981;
@@ -5750,7 +5769,7 @@ body.otp-page {
 }
 
 .refer-referrals-empty {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #9ca3af;
@@ -5769,7 +5788,7 @@ body.otp-page {
 }
 
 .refer-code-label {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #6b7280;
@@ -5782,7 +5801,7 @@ body.otp-page {
 }
 
 .refer-code-value {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #3b82f6;
@@ -5811,7 +5830,7 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 22px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -6713,7 +6732,7 @@ body.otp-page {
 
 .date-picker-title {
   text-align: center;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: #111827;
   font-size: 17px;
   font-weight: 500;
@@ -6749,7 +6768,8 @@ body.otp-page {
   left: 20px;
   right: 20px;
   height: 60px;
-  background: linear-gradient(to bottom, 
+  background: linear-gradient(
+    to bottom,
     rgba(255, 255, 255, 1) 0%,
     rgba(255, 255, 255, 0.95) 40%,
     rgba(255, 255, 255, 0) 100%
@@ -6764,7 +6784,8 @@ body.otp-page {
   left: 20px;
   right: 20px;
   height: 60px;
-  background: linear-gradient(to top,
+  background: linear-gradient(
+    to top,
     rgba(255, 255, 255, 1) 0%,
     rgba(255, 255, 255, 0.95) 40%,
     rgba(255, 255, 255, 0) 100%
@@ -6817,7 +6838,7 @@ body.otp-page {
   align-items: center;
   justify-content: center;
   padding: 0 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 17px;
   color: #9ca3af;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -6850,7 +6871,7 @@ body.otp-page {
   background: #3b82f6;
   color: #ffffff;
   border: none;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.2px;
@@ -7167,7 +7188,8 @@ body.otp-page {
   overflow: hidden;
   border-radius: 20px;
   background: white;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
   margin: 0 auto;
   max-width: 100%;
 }
@@ -7602,7 +7624,8 @@ body.otp-page {
 }
 
 @keyframes arrowPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: translateX(0);
   }
@@ -7617,7 +7640,8 @@ body.otp-page {
 }
 
 @keyframes arrowPulseLeft {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: translateX(0);
   }
@@ -7632,7 +7656,8 @@ body.otp-page {
 }
 
 @keyframes arrowPulseRight {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: translateX(0);
   }
@@ -7675,7 +7700,7 @@ body.otp-page {
 }
 
 .product-detail-swipe-icon::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -2px;
   border-radius: 50%;
@@ -7687,7 +7712,8 @@ body.otp-page {
 }
 
 @keyframes iconGlow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
   }
   50% {
@@ -7733,10 +7759,6 @@ body.otp-page {
   transition: all 0.2s;
   flex: 1;
   text-align: center;
-}
-
-.product-detail-logo:hover {
-  color: #ef4444;
 }
 
 /* Thumbnail Gallery at Bottom Center of Main Image */
@@ -7900,7 +7922,7 @@ body.otp-page {
 }
 
 .product-tab.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -8251,13 +8273,17 @@ body.otp-page {
 }
 
 .order-success-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
   animation: rotate 20s linear infinite;
 }
 
@@ -8358,7 +8384,7 @@ body.otp-page {
 }
 
 .delivery-estimate-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -8382,7 +8408,8 @@ body.otp-page {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
