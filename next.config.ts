@@ -11,7 +11,13 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'cdn.shopify.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'brmh.in',
+      },
     ],
+    // PERF: Enable image optimization
+    formats: ['image/webp', 'image/avif'],
   },
   // Enable strict mode for better error detection
   reactStrictMode: true,
