@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { clearAllAuthData, logRemainingData } from '@/lib/authLogout'
 import BottomNavbar from '@/components/BottomNavbar'
 import ProfileHeader from '@/components/ProfileHeader'
 import ProfileCard from '@/components/ProfileCard'
@@ -64,9 +65,16 @@ export default function ProfilePage() {
   }
 
   const confirmLogout = () => {
-    localStorage.setItem('Inkhubuthenticated', 'false')
-    localStorage.removeItem('bagichaPhoneNumber')
+    // Clear all authentication and user data
+    clearAllAuthData()
+    
+    // Log remaining data for verification (optional - for debugging)
+    logRemainingData()
+    
+    // Dispatch auth changed event
     window.dispatchEvent(new Event('authChanged'))
+    
+    // Close modal and redirect
     setShowLogoutModal(false)
     router.push('/')
   }

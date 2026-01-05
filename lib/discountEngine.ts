@@ -4,6 +4,7 @@
  */
 
 import type { CartItem } from '@/types'
+import { round2 } from '@/utils/round'
 
 export interface PriceRule {
   id: number
@@ -91,26 +92,33 @@ export function applyDiscountToCart(
   discount = Math.max(0, Math.min(discount, subtotal))
 
   // Calculate total: subtotal - discount + delivery fee
-  const total = Math.max(0, subtotal - discount + deliveryFee)
+  const rawTotal = Math.max(0, subtotal - discount + deliveryFee)
 
   // Calculate savings (same as discount for now)
-  const savings = discount
+  const rawSavings = discount
+
+  // Round all monetary values to 2 decimal places to avoid floating point leaks
+  const subtotalRounded = round2(subtotal)
+  const discountRounded = round2(discount)
+  const deliveryFeeRounded = round2(deliveryFee)
+  const total = round2(rawTotal)
+  const savings = round2(rawSavings)
 
   // Debug logging (only in development)
   if (process.env.NODE_ENV === 'development') {
     console.log('💰 Final Totals:', {
-      subtotal: subtotal.toFixed(2),
-      discount: discount.toFixed(2),
-      deliveryFee: deliveryFee.toFixed(2),
+      subtotal: subtotalRounded.toFixed(2),
+      discount: discountRounded.toFixed(2),
+      deliveryFee: deliveryFeeRounded.toFixed(2),
       total: total.toFixed(2),
-      calculation: `${subtotal} - ${discount} + ${deliveryFee} = ${total}`,
+      calculation: `${subtotal} - ${discount} + ${deliveryFee} = ${rawTotal}`,
     })
   }
 
   return {
-    subtotal,
-    discount,
-    deliveryFee,
+    subtotal: subtotalRounded,
+    discount: discountRounded,
+    deliveryFee: deliveryFeeRounded,
     total,
     savings,
   }

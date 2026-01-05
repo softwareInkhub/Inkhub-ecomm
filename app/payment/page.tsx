@@ -176,73 +176,164 @@ export default function PaymentPage() {
   ]
 
   const completeOrder = async (paymentData: any = null) => {
-    // Get scheduled delivery info
-    const scheduledDelivery = localStorage.getItem('scheduledDelivery')
-    const appliedCouponData = getAppliedCoupon()
-    const address = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
-    const customerDetails = getCustomerDetails()
-    
-    // Create order details
-    const orderDetails: any = {
-      orderId: paymentData?.razorpay_order_id || `ORD${Date.now()}`,
-      items: cartItems,
-      total: total,
-      subtotal: calculateSubtotal(),
-      couponDiscount: calculateCouponDiscount(),
-      appliedCoupon: appliedCouponData ? appliedCouponData.code : null,
-      couponDetails: appliedCouponData,
-      paymentMethod: selectedPayment,
-      paymentId: paymentData?.razorpay_payment_id || paymentData?.paymentId || 'PENDING',
-      address: address,
-      scheduledDelivery: scheduledDelivery ? JSON.parse(scheduledDelivery) : null,
-      orderDate: new Date().toISOString(),
-      status: 'confirmed'
-    }
-
-    // Create order in Shopify via API
     try {
-      const shopifyResponse = await fetch('/api/create-shopify-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customer: customerDetails,
-          items: cartItems,
-          shippingAddress: address,
-          total: total,
-          orderId: orderDetails.orderId,
-          paymentDetails: paymentData
-        }),
-      })
-
-      if (shopifyResponse.ok) {
-        const shopifyOrder = await shopifyResponse.json()
-        if (shopifyOrder && shopifyOrder.id) {
-          console.log('Order created in Shopify:', shopifyOrder.id)
-          orderDetails.shopifyOrderId = shopifyOrder.id
-          orderDetails.shopifyOrderNumber = shopifyOrder.order_number
-        }
+      console.log('🎯 COMPLETING ORDER...')
+      console.log('💳 Payment Data:', paymentData)
+      
+      // Get scheduled delivery info
+      const scheduledDelivery = localStorage.getItem('scheduledDelivery')
+      const appliedCouponData = getAppliedCoupon()
+      const address = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
+      const customerDetails = getCustomerDetails()
+      
+      // Calculate totals fresh (ensures consistency with Razorpay)
+      const orderTotals = calculateOrderTotal(cartItems)
+      
+      console.log('👤 Customer Details:', customerDetails)
+      console.log('📍 Address:', address)
+      console.log('💰 Order Totals:', orderTotals)
+      console.log('💳 Applied Coupon Data:', appliedCouponData)
+      
+      // Create order details
+      const orderDetails: any = {
+        orderId: paymentData?.razorpay_order_id || `ORD${Date.now()}`,
+        items: cartItems,
+        total: orderTotals.total,
+        subtotal: orderTotals.subtotal,
+        couponDiscount: orderTotals.couponDiscount,
+        appliedCoupon: appliedCouponData ? appliedCouponData.code : null,
+        couponDetails: appliedCouponData,
+        paymentMethod: selectedPayment,
+        paymentId: paymentData?.razorpay_payment_id || paymentData?.paymentId || 'PENDING',
+        address: address,
+        scheduledDelivery: scheduledDelivery ? JSON.parse(scheduledDelivery) : null,
+        orderDate: new Date().toISOString(),
+        status: 'confirmed'
       }
+
+      console.log('✅ Order Details Created:', orderDetails)
+
+      // Prepare discount data for Shopify
+      let shopifyDiscount = null
+      if (appliedCouponData) {
+        const isPercentage = appliedCouponData.discountType === 'percentage'
+        shopifyDiscount = {
+          code: appliedCouponData.code,
+          type: isPercentage ? 'percentage' : 'fixed_amount',
+          // For percentage type send the percent value (e.g. 20), for fixed_amount send the absolute amount
+          value: isPercentage
+            ? (appliedCouponData.discountValue || appliedCouponData.discountAmount || 0)
+            : (appliedCouponData.discountAmount || appliedCouponData.discountValue || 0),
+          title: appliedCouponData.title || appliedCouponData.code,
+        }
+        console.log('💰 Shopify Discount prepared:', shopifyDiscount)
+      }
+
+      // Create draft order in Shopify via API (with discount support)
+      let shopifyOrderId = null
+      let shopifyOrderNumber = null
+      let draftOrderId = null
+      
+      try {
+        console.log('📋 Creating Shopify draft order with discount support...')
+        const shopifyResponse = await fetch('/api/create-shopify-draft-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customer: customerDetails,
+            items: cartItems,
+            shippingAddress: address,
+            total: orderTotals.total,
+            orderId: orderDetails.orderId,
+            paymentDetails: paymentData,
+            appliedDiscount: shopifyDiscount,
+          }),
+        })
+
+        if (shopifyResponse.ok) {
+          const draftOrderResponse = await shopifyResponse.json()
+          if (draftOrderResponse.success && draftOrderResponse.draft_order) {
+            const draftOrder = draftOrderResponse.draft_order
+            draftOrderId = draftOrder.id
+            
+            console.log('✅ Draft order created successfully:', draftOrderId)
+            console.log('📋 Draft Order Details:', draftOrder)
+            console.log('💰 Applied Discount:', draftOrder.applied_discount)
+            
+            orderDetails.shopifyDraftOrderId = draftOrderId
+            
+            // Now complete the draft order to convert it to a regular order
+            console.log('✅ Completing draft order to create final Shopify order...')
+            try {
+              const completeDraftResponse = await fetch('/api/complete-draft-order', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  draftOrderId: draftOrderId,
+                  paymentDetails: paymentData,
+                }),
+              })
+
+              if (completeDraftResponse.ok) {
+                const completedOrder = await completeDraftResponse.json()
+                if (completedOrder.success && completedOrder.order) {
+                  const finalOrder = completedOrder.order
+                  shopifyOrderId = finalOrder.id
+                  shopifyOrderNumber = finalOrder.order_number
+                  
+                  console.log('✅ Draft order completed to Shopify order:', shopifyOrderId)
+                  console.log('💰 Total Discounts in Shopify:', finalOrder.total_discounts)
+                  console.log('💳 Discount Codes:', finalOrder.discount_codes)
+                  console.log('💵 Final Total Price:', finalOrder.total_price)
+                  
+                  orderDetails.shopifyOrderId = shopifyOrderId
+                  orderDetails.shopifyOrderNumber = shopifyOrderNumber
+                  orderDetails.shopifyTotalDiscounts = finalOrder.total_discounts
+                  orderDetails.shopifyDiscountCodes = finalOrder.discount_codes
+                }
+              } else {
+                console.warn('⚠️ Failed to complete draft order, but draft exists:', draftOrderId)
+              }
+            } catch (error) {
+              console.error('⚠️ Error completing draft order:', error)
+              console.warn('⚠️ Draft order exists but could not be completed automatically:', draftOrderId)
+            }
+          }
+        } else {
+          console.error('⚠️ Failed to create draft order')
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to create order in Shopify:', error)
+        console.warn('⚠️ Order processed but Shopify draft order sync failed. Manual sync may be required.')
+      }
+
+      // Save order to order history
+      const orderHistory = JSON.parse(localStorage.getItem('bagichaOrders') || '[]')
+      orderHistory.unshift(orderDetails)
+      localStorage.setItem('bagichaOrders', JSON.stringify(orderHistory))
+
+      console.log('✅ Order saved successfully:', orderDetails.orderId)
+      console.log('📦 Total orders in history:', orderHistory.length)
+
+      // Clear cart and coupon
+      localStorage.removeItem('bagichaCart')
+      localStorage.removeItem('appliedCoupon')
+      window.dispatchEvent(new Event('cartUpdated'))
+
+      setIsProcessing(false)
+      
+      // Navigate to success page
+      console.log('🚀 Redirecting to order-success page...')
+      router.push('/order-success')
     } catch (error) {
-      console.error('Failed to create order in Shopify:', error)
-      // Continue with order even if Shopify fails
+      console.error('❌ Error completing order:', error)
+      setErrorMessage('Failed to complete order. Please try again.')
+      setIsProcessing(false)
     }
-
-    // Save order to order history
-    const orderHistory = JSON.parse(localStorage.getItem('bagichaOrders') || '[]')
-    orderHistory.unshift(orderDetails)
-    localStorage.setItem('bagichaOrders', JSON.stringify(orderHistory))
-
-    // Clear cart and coupon
-    localStorage.removeItem('bagichaCart')
-    localStorage.removeItem('appliedCoupon')
-    window.dispatchEvent(new Event('cartUpdated'))
-
-    setIsProcessing(false)
-    
-    // Navigate to success page
-    router.push('/order-success')
   }
 
   const handlePlaceOrder = async () => {
@@ -275,6 +366,27 @@ export default function PaymentPage() {
       setTimeout(() => {
         setErrorMessage('')
       }, 5000)
+    }
+  }
+
+  // Developer helper: simulate a successful Razorpay payment (for local testing)
+  const simulatePayment = async () => {
+    try {
+      setIsProcessing(true)
+      setErrorMessage('')
+
+      const fakeResponse = {
+        razorpay_payment_id: `pay_TEST_${Date.now()}`,
+        razorpay_order_id: `order_TEST_${Date.now()}`,
+        razorpay_signature: 'simulated_signature'
+      }
+
+      console.log('🔧 Simulating Razorpay success with:', fakeResponse)
+      await completeOrder(fakeResponse)
+    } catch (err) {
+      console.error('Simulation error:', err)
+      setErrorMessage('Simulation failed')
+      setIsProcessing(false)
     }
   }
 
@@ -616,6 +728,16 @@ export default function PaymentPage() {
         >
           {isProcessing ? 'Processing...' : 'Place Order'}
         </button>
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            className="payment-simulate-btn"
+            onClick={simulatePayment}
+            disabled={isProcessing}
+            style={{ marginLeft: '12px' }}
+          >
+            Simulate Payment
+          </button>
+        )}
         </div>
       )}
 

@@ -26,26 +26,49 @@ interface OrderDetails {
 export default function OrderSuccessPage() {
   const router = useRouter()
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log('📄 Order Success Page Loaded')
+    
     // Check authentication
     const isAuthenticated = localStorage.getItem('Inkhubuthenticated') === 'true'
+    console.log('🔐 Is Authenticated:', isAuthenticated)
+    
     if (!isAuthenticated) {
+      console.log('❌ Not authenticated, redirecting to profile')
       router.push('/profile')
       return
     }
 
     // Get order details from latest order
     const orders = JSON.parse(localStorage.getItem('bagichaOrders') || '[]')
+    console.log('📦 Orders found:', orders.length)
+    
     if (orders.length > 0) {
+      console.log('✅ Setting order details:', orders[0].orderId)
       setOrderDetails(orders[0])
+      setLoading(false)
     } else {
+      console.log('❌ No orders found, redirecting to home')
       router.push('/')
     }
   }, [router])
 
-  if (!orderDetails) {
-    return null
+  if (loading || !orderDetails) {
+    return (
+      <div className="order-success-page">
+        <div className="order-success-header">
+          <div className="success-checkmark">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="38" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="2"/>
+              <path d="M25 40 L35 50 L55 30" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h1 className="success-title">Loading Order Details...</h1>
+        </div>
+      </div>
+    )
   }
 
   const formatDate = (dateString: string) => {

@@ -232,7 +232,7 @@ export default function ProductPage() {
               className={`product-thumbnail ${index === selectedImageIndex ? 'active' : ''}`}
               onClick={() => setSelectedImageIndex(index)}
             >
-              <img src={img} alt={`${product.title || product.name} view ${index + 1}`} />
+              <img src={img} alt={`${product.title || product.name} view ${index + 1}`} loading="lazy" />
             </button>
           ))}
         </div>

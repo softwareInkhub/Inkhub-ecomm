@@ -107,5 +107,63 @@ export interface ShopifyOrderData {
   total: number
   orderId: string
   paymentDetails?: PaymentDetails
+  appliedDiscount?: AppliedDiscountForShopify
+}
+
+export interface AppliedDiscountForShopify {
+  code: string
+  type: 'fixed_amount' | 'percentage'
+  value: number
+  title: string
+}
+
+export interface ShopifyDraftOrder {
+  id: string
+  order_id?: string
+  line_items: Array<{
+    title: string
+    quantity: number
+    price: string
+    sku?: string
+  }>
+  customer?: {
+    first_name: string
+    last_name: string
+    email?: string
+    phone_number?: string
+  }
+  shipping_address?: {
+    first_name: string
+    last_name: string
+    address1: string
+    address2?: string
+    city: string
+    province: string
+    zip: string
+    country: string
+    phone?: string
+  }
+  billing_address?: {
+    first_name: string
+    last_name: string
+    address1: string
+    address2?: string
+    city: string
+    province: string
+    zip: string
+    country: string
+    phone?: string
+  }
+  applied_discount?: {
+    description: string
+    value: string
+    value_type: 'fixed_amount' | 'percentage'
+  }
+  note?: string
+  note_attributes?: Array<{
+    name: string
+    value: string
+  }>
+  tags?: string
 }
 

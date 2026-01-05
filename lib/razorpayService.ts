@@ -5,6 +5,7 @@
  */
 
 import type { RazorpayOrderResponse } from '@/types'
+import { round2 } from '@/utils/round'
 
 declare global {
   interface Window {
@@ -215,7 +216,7 @@ class RazorpayService {
 
     const options: RazorpayOptions = {
       key: this.keyId,
-      amount: Math.round(amount * 100), // Amount in paise
+      amount: Math.round(round2(amount) * 100), // Amount in paise (rounded first)
       currency: 'INR',
       name: 'Inkhub',
       description: 'Tattoos Purchase',

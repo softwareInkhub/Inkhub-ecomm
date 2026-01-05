@@ -5,6 +5,7 @@
  */
 
 import type { CartItem, Address, Customer } from '@/types'
+import { round2 } from '@/utils/round'
 
 interface GoKwikConfig {
   merchantId: string
@@ -123,7 +124,7 @@ class GoKwikService {
       const payload = {
         merchant_id: this.config.merchantId,
         order_id: orderId,
-        amount: Math.round(amount * 100), // Convert to paise
+        amount: Math.round(round2(amount) * 100), // Convert to paise (rounded first)
         currency: this.config.paymentConfig.currency,
         customer: {
           name: customerDetails.name,
@@ -142,7 +143,7 @@ class GoKwikService {
         items: items.map(item => ({
           name: item.title,
           quantity: item.quantity || 1,
-          price: Math.round(item.price * 100),
+          price: Math.round(round2(Number(item.price || 0)) * 100),
           sku: item.id,
         })),
         callback_url: this.config.callbackUrls.success,
@@ -305,7 +306,7 @@ class GoKwikService {
       }
 
       if (amount) {
-        payload.amount = Math.round(amount * 100) // Convert to paise
+        payload.amount = Math.round(round2(amount) * 100) // Convert to paise (rounded first)
       }
 
       const response = await fetch(`${this.apiUrl}/refunds`, {

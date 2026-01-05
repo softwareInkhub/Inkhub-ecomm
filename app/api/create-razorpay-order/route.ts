@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
+import { round2 } from '@/utils/round'
 
 // Initialize Razorpay with environment variables
 const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || ''
@@ -32,16 +33,17 @@ export async function POST(request: NextRequest) {
     const { amount, currency, receipt, notes } = body
 
     // Validate input
-    if (!amount || amount <= 0) {
+    if (typeof amount !== 'number' || Number.isNaN(amount) || amount <= 0) {
       return NextResponse.json(
         { success: false, error: 'Invalid amount' },
         { status: 400 }
       )
     }
 
-    // Create order options
+    // Round amount to 2 decimals to avoid floating point leaks then convert to paise
+    const amountRounded = round2(amount)
     const options = {
-      amount: Math.round(amount * 100), // Convert to paise
+      amount: Math.round(amountRounded * 100), // Convert to paise
       currency: currency || 'INR',
       receipt: receipt || `receipt_${Date.now()}`,
       notes: notes || {},

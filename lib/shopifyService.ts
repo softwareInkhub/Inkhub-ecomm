@@ -8,6 +8,7 @@
 
 import type { ShopifyOrderData, DiscountCode } from '@/types'
 import { getCachedCoupon, setCachedCoupon } from './couponCache'
+import { logResponse, logErrorResponse } from './responseLogger'
 
 interface ShopifyOrderResponse {
   id: number
@@ -109,6 +110,9 @@ class ShopifyService {
       console.log('📦 Response Data:', JSON.stringify(data, null, 2))
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
+      // Log response to file
+      await logResponse('create-shopify-order', data, requestBody)
+
       if (!response.ok || !data.success) {
         console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         console.error('❌ SHOPIFY ORDER CREATION FAILED')
@@ -129,11 +133,166 @@ class ShopifyService {
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.error('❌ SHOPIFY CREATE ORDER ERROR')
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('Error:', error)
-      console.error('Message:', (error as Error).message)
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      
+      // Log error to file
+      await logErrorResponse('create-shopify-order', error, orderData)
+      
       // Don't throw error - allow order to complete even if Shopify fails
       console.warn('⚠️ Order processed but Shopify sync failed. Manual sync may be required.')
+      return null
+    }
+  }
+
+  /**
+   * Create a draft order in Shopify with discount support
+   * @param orderData - Order details including applied discount
+   * @returns Created draft order
+   */
+  async createDraftOrder(orderData: ShopifyOrderData): Promise<any | null> {
+    try {
+      const apiUrl = typeof window !== 'undefined' 
+        ? '/api/create-shopify-draft-order' 
+        : (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000') + '/api/create-shopify-draft-order'
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('📋 CREATING SHOPIFY DRAFT ORDER')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('📍 API URL:', apiUrl)
+
+      const {
+        customer,
+        items,
+        shippingAddress,
+        total,
+        orderId,
+        paymentDetails,
+        appliedDiscount
+      } = orderData
+
+      const requestBody = {
+        customer,
+        items,
+        shippingAddress,
+        total,
+        orderId,
+        paymentDetails,
+        appliedDiscount
+      }
+
+      console.log('📦 Request Body:', JSON.stringify(requestBody, null, 2))
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      })
+
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('📡 SHOPIFY DRAFT ORDER CREATION RESPONSE')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('📊 Status:', response.status, response.statusText)
+      console.log('✅ Response OK:', response.ok)
+
+      const data = await response.json()
+      console.log('📦 Response Data:', JSON.stringify(data, null, 2))
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+      await logResponse('create-shopify-draft-order', data, requestBody)
+
+      if (!response.ok || !data.success) {
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.error('❌ SHOPIFY DRAFT ORDER CREATION FAILED')
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.error('Error:', data.error)
+        console.error('Details:', data.details)
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        throw new Error(data.error || 'Failed to create draft order in Shopify')
+      }
+
+      console.log('✅ Shopify draft order created:', data.draft_order.id)
+      return data.draft_order
+    } catch (error) {
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('❌ SHOPIFY CREATE DRAFT ORDER ERROR')
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      
+      await logErrorResponse('create-shopify-draft-order', error, orderData)
+      
+      console.warn('⚠️ Draft order creation failed. May fall back to regular order.')
+      return null
+    }
+  }
+
+  /**
+   * Complete a draft order in Shopify (converts to actual order)
+   * @param draftOrderId - The draft order ID to complete
+   * @param paymentDetails - Payment details for order metadata
+   * @returns Completed order
+   */
+  async completeDraftOrder(draftOrderId: string, paymentDetails?: any): Promise<any | null> {
+    try {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('✅ COMPLETING DRAFT ORDER')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('Draft Order ID:', draftOrderId)
+
+      const storeUrl = this.storeUrl
+      const apiUrl = `https://${storeUrl}/admin/api/${this.apiVersion}/draft_orders/${draftOrderId}/complete.json`
+
+      const payload = {
+        draft_order: {
+          payment_pending: false,
+          payment_terms: {
+            payment_terms_type: 'net',
+            payment_terms_net_days: 0
+          }
+        }
+      }
+
+      console.log('📡 API URL:', apiUrl)
+      console.log('📦 Payload:', JSON.stringify(payload, null, 2))
+
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: this.getAdminHeaders(),
+        body: JSON.stringify(payload),
+      })
+
+      console.log('📊 Status:', response.status, response.statusText)
+
+      const data = await response.json()
+      console.log('📦 Response Data:', JSON.stringify(data, null, 2))
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+      await logResponse('complete-draft-order', data, { draftOrderId, paymentDetails })
+
+      if (!response.ok) {
+        console.error('❌ Failed to complete draft order')
+        console.error('Errors:', data.errors)
+        throw new Error('Failed to complete draft order in Shopify')
+      }
+
+      const order = data.draft_order.order
+      console.log('✅ Draft order completed to Shopify order:', order.id)
+      
+      return {
+        id: order.id,
+        order_number: order.order_number,
+        total_price: order.total_price,
+        total_discounts: order.total_discounts,
+        discount_codes: order.discount_codes
+      }
+    } catch (error) {
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('❌ SHOPIFY COMPLETE DRAFT ORDER ERROR')
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('Error:', error)
+      
+      await logErrorResponse('complete-draft-order', error, { draftOrderId })
+      
       return null
     }
   }
@@ -158,9 +317,17 @@ class ShopifyService {
       }
 
       const data = await response.json()
+
+      // Log response to file
+      await logResponse('get-product', data, { productId })
+
       return data.product
     } catch (error) {
       console.error('Shopify Get Product Error:', error)
+      
+      // Log error to file
+      await logErrorResponse('get-product', error, { productId })
+      
       throw error
     }
   }
@@ -187,9 +354,17 @@ class ShopifyService {
       }
 
       const data = await response.json()
+
+      // Log response to file
+      await logResponse('update-order', data, { shopifyOrderId, updates })
+
       return data.order
     } catch (error) {
       console.error('Shopify Update Order Error:', error)
+      
+      // Log error to file
+      await logErrorResponse('update-order', error, { shopifyOrderId, updates })
+      
       throw error
     }
   }
@@ -200,57 +375,64 @@ class ShopifyService {
    * @param cartTotal - The cart total amount
    * @returns Validation result with discount details
    */
-async validateDiscountCode(discountCode: string, cartTotal: number) {
-  const code = discountCode.toUpperCase()
+  async validateDiscountCode(discountCode: string, cartTotal: number) {
+    const code = discountCode.toUpperCase()
 
-  try {
-    /* 1️⃣ CHECK REDIS */
-    const cached = await getCachedCoupon(code, cartTotal)
-    if (cached) {
-      console.log('⚡ Coupon cache HIT:', code)
-      return cached
+    try {
+      /* 1️⃣ CHECK REDIS */
+      const cached = await getCachedCoupon(code, cartTotal)
+      if (cached) {
+        console.log('⚡ Coupon cache HIT:', code)
+        return cached
+      }
+
+      console.log('🐢 Coupon cache MISS:', code)
+
+      /* 2️⃣ BACKEND CALL */
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+
+      const response = await fetch(`${backendUrl}/api/validate-discount`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, cartTotal }),
+      })
+
+      const data = await response.json()
+
+      // Log response to file
+      await logResponse('validate-discount', data, { code, cartTotal })
+
+      const result =
+        response.ok && data.success && data.valid
+          ? {
+              valid: true,
+              code: data.code,
+              discountAmount: data.discountAmount,
+              discountType: data.discountType,
+              discountValue: data.discountValue,
+              priceRuleId: data.priceRuleId,
+              title: data.title,
+            }
+          : {
+              valid: false,
+              code,
+              error: data.error || 'Invalid discount code',
+            }
+
+      /* 3️⃣ SAVE IN REDIS */
+      await setCachedCoupon(code, cartTotal, result)
+
+      return result
+    } catch (err) {
+      console.error('❌ Coupon validation failed:', err)
+      
+      // Log error to file
+      await logErrorResponse('validate-discount', err, { code, cartTotal })
+      
+      return this.fallbackValidation(code, cartTotal)
     }
-
-    console.log('🐢 Coupon cache MISS:', code)
-
-    /* 2️⃣ BACKEND CALL */
-    const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
-
-    const response = await fetch(`${backendUrl}/api/validate-discount`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, cartTotal }),
-    })
-
-    const data = await response.json()
-
-    const result =
-      response.ok && data.success && data.valid
-        ? {
-            valid: true,
-            code: data.code,
-            discountAmount: data.discountAmount,
-            discountType: data.discountType,
-            discountValue: data.discountValue,
-            priceRuleId: data.priceRuleId,
-            title: data.title,
-          }
-        : {
-            valid: false,
-            code,
-            error: data.error || 'Invalid discount code',
-          }
-
-    /* 3️⃣ SAVE IN REDIS */
-    await setCachedCoupon(code, cartTotal, result)
-
-    return result
-  } catch (err) {
-    console.error('❌ Coupon validation failed:', err)
-    return this.fallbackValidation(code, cartTotal)
   }
-}
 
 
   /**

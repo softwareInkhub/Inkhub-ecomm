@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { round2 } from '@/utils/round'
 
 export async function POST(request: NextRequest) {
   try {
@@ -155,6 +156,7 @@ export async function POST(request: NextRequest) {
     }
 
     discountAmount = Math.min(discountAmount, cartTotal);
+    const discountAmountRounded = round2(discountAmount)
 
     // ----------------------------
     // SUCCESS RESPONSE
@@ -164,7 +166,7 @@ export async function POST(request: NextRequest) {
       success: true,
       valid: true,
       code: discountCode.code,
-      discountAmount,
+      discountAmount: discountAmountRounded,
       discountType: rule.value_type,
       discountValue: rule.value,
       priceRuleId: rule.id,

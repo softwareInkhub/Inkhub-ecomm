@@ -288,9 +288,9 @@ export default function CategoriesPage() {
 
       <div className="categories-content">
         <aside className="categories-sidebar" ref={sidebarRef as React.RefObject<HTMLElement>}>
-          {mainCategories.map((category) => (
+          {mainCategories.map((category, index) => (
             <div
-              key={category.id}
+              key={`${category.id}-${index}`}
               ref={(el) => { if (el) sidebarItemRefs.current[category.name] = el }}
               className={`category-sidebar-item ${selectedCategory === category.name ? 'active' : ''}`}
               onClick={() => handleCategoryClick(category.name)}
