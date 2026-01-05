@@ -179,11 +179,7 @@
         "buttonText": "SHOP NOW",
         "bgColor": "linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)",
         "order": 0,
-        "products": [
-          "10152481292603",
-          "9590022406459",
-          "9590022406459"
-        ]
+        "products": ["10152481292603", "9590022406459", "9590022406459"]
       },
       {
         "id": "minimal-trend",
@@ -194,9 +190,7 @@
         "buttonText": "EXPLORE",
         "bgColor": "linear-gradient(135deg, #d97706 0%, #92400e 100%)",
         "order": 1,
-        "products": [
-          "9590022406459"
-        ]
+        "products": ["9590022406459"]
       },
       {
         "id": "trend-1763014758781",
@@ -207,9 +201,7 @@
         "buttonText": "SHOP NOW",
         "bgColor": "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
         "order": 2,
-        "products": [
-          "9590022406459"
-        ]
+        "products": ["9590022406459"]
       },
       {
         "id": "trend-1763019769947",
@@ -220,9 +212,7 @@
         "buttonText": "SHOP NOW",
         "bgColor": "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
         "order": 3,
-        "products": [
-          "9590022406459"
-        ]
+        "products": ["9590022406459"]
       }
     ]
   },
@@ -250,7 +240,6 @@
       "Bold & Dark Tattoos",
       "Tattoos Packs",
       "Body Placement Tattoos",
-      "Lifestyle Tattoos",
       "Lifestyle Tattoos",
       "Tattoos Size & Type"
     ]

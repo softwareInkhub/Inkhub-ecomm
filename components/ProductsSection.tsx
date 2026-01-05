@@ -405,7 +405,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           categoryTitle !== "All Tattoos" &&
           !hideCategoryImage && (
             <div className="category-image-header">
-              <img src={categoryImage} alt={categoryTitle} />
+              <img src={categoryImage} alt={categoryTitle} loading="lazy" />
             </div>
           )}
         {categoryTitle !== "All Tattoos" && (
