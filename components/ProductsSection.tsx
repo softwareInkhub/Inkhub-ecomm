@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { fetchProducts } from "@/lib/productsService";
+import { getProductsByCategory } from "@/lib/productsService";
 import type { Product } from "@/types";
+import Image from "next/image";
 
 interface ProductsSectionProps {
   onWishlistClick?: () => void;
@@ -24,7 +25,11 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 }) => {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedImageIndices, setSelectedImageIndices] = useState<{
+  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const selectedImageIndices = useRef<{ [key: string]: number }>({});
+  const [selectedImageIndicesState, setSelectedImageIndicesState] = useState<{
     [key: string]: number;
   }>({});
   const [touchStartX, setTouchStartX] = useState<{
@@ -34,66 +39,133 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     {}
   );
   const [wishlistedIds, setWishlistedIds] = useState<string[]>([]);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const INITIAL_LIMIT = 12;
+  const LOAD_MORE_LIMIT = 12;
 
+  // PERF: Memoize filtered and sorted products
+  const processedProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Filter by size if not 'all'
+    if (filterSize !== "all") {
+      filtered = filtered.filter((p) => {
+        if ((p as any).size) {
+          return (p as any).size.toLowerCase() === filterSize.toLowerCase();
+        }
+        return true;
+      });
+    }
+
+    // Sort products based on sortBy
+    if (sortBy === "price-low") {
+      filtered.sort((a, b) => {
+        const priceA = a.price || 0;
+        const priceB = b.price || 0;
+        return priceA - priceB;
+      });
+    } else if (sortBy === "price-high") {
+      filtered.sort((a, b) => {
+        const priceA = a.price || 0;
+        const priceB = b.price || 0;
+        return priceB - priceA;
+      });
+    } else if (sortBy === "relevancy") {
+      filtered.sort((a, b) => {
+        const idA = parseInt(a.id) || 0;
+        const idB = parseInt(b.id) || 0;
+        return idB - idA;
+      });
+    }
+
+    return filtered;
+  }, [products, filterSize, sortBy]);
+
+  // PERF: Load products using optimized service
   useEffect(() => {
     const loadProducts = async () => {
+      setIsLoading(true);
       try {
-        const data = await fetchProducts();
-
-        // Filter products by category if categoryTitle is provided
-        let filteredProducts = data;
+        // PERF: Use getProductsByCategory for better caching
+        let data: Product[] = [];
         if (
           categoryTitle &&
           categoryTitle !== "Shop Now" &&
           categoryTitle !== "All Tattoos"
         ) {
-          filteredProducts = data.filter((p) => p.category === categoryTitle);
+          data = await getProductsByCategory(categoryTitle);
+        } else {
+          // For "All Tattoos" or "Shop Now", fetch all (but limit initial load)
+          const { fetchProducts } = await import("@/lib/productsService");
+          const allProducts = await fetchProducts();
+          data = allProducts;
         }
 
-        // Filter by size if not 'all'
-        if (filterSize !== "all") {
-          filteredProducts = filteredProducts.filter((p) => {
-            // Assuming products have a size property
-            if ((p as any).size) {
-              return (p as any).size.toLowerCase() === filterSize.toLowerCase();
-            }
-            return true; // If no size property, include the product
-          });
-        }
-
-        // Sort products based on sortBy
-        if (sortBy === "price-low") {
-          filteredProducts.sort((a, b) => {
-            const priceA = a.price || 0;
-            const priceB = b.price || 0;
-            return priceA - priceB;
-          });
-        } else if (sortBy === "price-high") {
-          filteredProducts.sort((a, b) => {
-            const priceA = a.price || 0;
-            const priceB = b.price || 0;
-            return priceB - priceA;
-          });
-        } else if (sortBy === "relevancy") {
-          // Sort by relevancy - could be based on popularity, ratings, or other factors
-          // For now, sorting by product ID (newest first) as a proxy for relevancy
-          filteredProducts.sort((a, b) => {
-            const idA = parseInt(a.id) || 0;
-            const idB = parseInt(b.id) || 0;
-            return idB - idA;
-          });
-        }
-
-        // For "All Tattoos", show all products; otherwise show first 12
-        const productLimit =
-          categoryTitle === "All Tattoos" ? filteredProducts.length : 12;
-        setProducts(filteredProducts.slice(0, productLimit));
+        setProducts(data);
+        // PERF: Initially show only first batch
+        const initialBatch = data.slice(0, INITIAL_LIMIT);
+        setDisplayedProducts(initialBatch);
+        setHasMore(data.length > INITIAL_LIMIT);
       } catch (error) {
         console.error("Error loading products:", error);
+        setProducts([]);
+        setDisplayedProducts([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadProducts();
-  }, [categoryTitle, filterSize, sortBy]);
+  }, [categoryTitle]);
+
+  // PERF: Update displayed products when filters/sort change
+  useEffect(() => {
+    const initialBatch = processedProducts.slice(0, INITIAL_LIMIT);
+    setDisplayedProducts(initialBatch);
+    setHasMore(processedProducts.length > INITIAL_LIMIT);
+  }, [processedProducts]);
+
+  // PERF: Load more products when intersection observer triggers
+  const loadMoreProducts = useCallback(() => {
+    if (isLoading || !hasMore) return;
+
+    const currentLength = displayedProducts.length;
+    const nextBatch = processedProducts.slice(
+      currentLength,
+      currentLength + LOAD_MORE_LIMIT
+    );
+
+    if (nextBatch.length > 0) {
+      setDisplayedProducts((prev) => [...prev, ...nextBatch]);
+      setHasMore(
+        currentLength + nextBatch.length < processedProducts.length
+      );
+    }
+  }, [displayedProducts.length, processedProducts, isLoading, hasMore]);
+
+  // PERF: IntersectionObserver for infinite scroll
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasMore) return;
+
+    if (!observerRef.current) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore && !isLoading) {
+            loadMoreProducts();
+          }
+        },
+        { rootMargin: "200px" }
+      );
+    }
+
+    observerRef.current.observe(loadMoreRef.current);
+
+    return () => {
+      if (observerRef.current && loadMoreRef.current) {
+        observerRef.current.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [hasMore, isLoading, loadMoreProducts]);
 
   useEffect(() => {
     const wishlist = JSON.parse(
@@ -151,7 +223,8 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     }));
   };
 
-  const handleImageTouchEnd = (productId: string, productImages: string[]) => {
+  // PERF: Memoize image touch handlers
+  const handleImageTouchEnd = useCallback((productId: string, productImages: string[]) => {
     if (!touchStartX[productId] || !touchEndX[productId]) {
       setTouchStartX((prev) => ({ ...prev, [productId]: null }));
       setTouchEndX((prev) => ({ ...prev, [productId]: null }));
@@ -162,26 +235,21 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     const minSwipe = 50;
 
     if (Math.abs(distance) > minSwipe) {
-      const currentIndex = selectedImageIndices[productId] || 0;
-      if (distance > 0) {
-        // Swiped left, go to next image
-        setSelectedImageIndices((prev) => ({
-          ...prev,
-          [productId]: (currentIndex + 1) % productImages.length,
-        }));
-      } else {
-        // Swiped right, go to previous image
-        setSelectedImageIndices((prev) => ({
-          ...prev,
-          [productId]:
-            (currentIndex - 1 + productImages.length) % productImages.length,
-        }));
-      }
+      const currentIndex = selectedImageIndices.current[productId] || 0;
+      const newIndex = distance > 0
+        ? (currentIndex + 1) % productImages.length
+        : (currentIndex - 1 + productImages.length) % productImages.length;
+      
+      selectedImageIndices.current[productId] = newIndex;
+      setSelectedImageIndicesState((prev) => ({
+        ...prev,
+        [productId]: newIndex,
+      }));
     }
 
     setTouchStartX((prev) => ({ ...prev, [productId]: null }));
     setTouchEndX((prev) => ({ ...prev, [productId]: null }));
-  };
+  }, [touchStartX, touchEndX]);
 
   const handleImageMouseDown = (productId: string, e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest(".product-wishlist-heart")) return;
@@ -208,20 +276,16 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
             const minSwipe = 50;
 
             if (Math.abs(distance) > minSwipe) {
-              const currentIndex = selectedImageIndices[productId] || 0;
-              if (distance > 0) {
-                setSelectedImageIndices((prev) => ({
-                  ...prev,
-                  [productId]: (currentIndex + 1) % productImages.length,
-                }));
-              } else {
-                setSelectedImageIndices((prev) => ({
-                  ...prev,
-                  [productId]:
-                    (currentIndex - 1 + productImages.length) %
-                    productImages.length,
-                }));
-              }
+              const currentIndex = selectedImageIndices.current[productId] || 0;
+              const newIndex = distance > 0
+                ? (currentIndex + 1) % productImages.length
+                : (currentIndex - 1 + productImages.length) % productImages.length;
+              
+              selectedImageIndices.current[productId] = newIndex;
+              setSelectedImageIndicesState((prev) => ({
+                ...prev,
+                [productId]: newIndex,
+              }));
             }
           }
           setTouchStartX((prev) => ({ ...prev, [productId]: null }));
@@ -238,13 +302,14 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
         document.removeEventListener("mouseup", handleMouseUp);
       };
     }
-  }, [touchStartX, touchEndX, selectedImageIndices, products]);
+  }, [touchStartX, touchEndX, displayedProducts]);
 
-  const handleProductClick = (product: Product) => {
+  // PERF: Memoize handlers
+  const handleProductClick = useCallback((product: Product) => {
     router.push(`/product/${product.id}`);
-  };
+  }, [router]);
 
-  const handleHeartClick = (productId: string, e: React.MouseEvent) => {
+  const handleHeartClick = useCallback((productId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const isAuthenticated =
       localStorage.getItem("Inkhubuthenticated") === "true";
@@ -295,9 +360,9 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 
     localStorage.setItem("bagichaWishlist", JSON.stringify(wishlist));
     setWishlistedIds(wishlist.map((item: Product) => item.id));
-  };
+  }, [onWishlistClick, displayedProducts]);
 
-  const handleAddToCart = (productId: string, e: React.MouseEvent) => {
+  const handleAddToCart = useCallback((productId: string, e: React.MouseEvent) => {
     if (e) e.stopPropagation();
     const cartItems = JSON.parse(localStorage.getItem("bagichaCart") || "[]");
     const product = products.find((p) => p.id === productId);
@@ -329,10 +394,10 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
         })
       );
     }
-  };
+  }, [displayedProducts]);
 
-  // Calculate previous price and discount for demo purposes
-  const getPriceInfo = (product: Product) => {
+  // PERF: Memoize price calculation
+  const getPriceInfo = useCallback((product: Product) => {
     const currentPrice = parseFloat(product.price?.toString() || "0");
 
     // Fixed discount percent based on product ID for consistency
@@ -383,29 +448,52 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
       previousPrice: previousPrice.toFixed(0),
       discountPercent,
     };
-  };
+  }, []);
 
-  // Get category image from first product
-  const getCategoryImage = () => {
-    if (products.length > 0 && products[0].image) {
-      return products[0].image;
+  // PERF: Memoize category image
+  const categoryImage = useMemo(() => {
+    if (displayedProducts.length > 0 && displayedProducts[0].image) {
+      return displayedProducts[0].image;
     }
     return null;
-  };
+  }, [displayedProducts]);
 
-  const categoryImage = getCategoryImage();
+  if (isLoading && displayedProducts.length === 0) {
+    return (
+      <section className="products-section" aria-label="Products">
+        <div className="products-content">
+          <div className="categories-loading">
+            <p>Loading products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  if (products.length === 0) return null;
+  if (displayedProducts.length === 0) return null;
 
   return (
     <section className="products-section" aria-label="Products">
       <div className="products-content">
-        {categoryImage &&
+          {categoryImage &&
           categoryTitle !== "Shop Now" &&
           categoryTitle !== "All Tattoos" &&
           !hideCategoryImage && (
             <div className="category-image-header">
-              <img src={categoryImage} alt={categoryTitle} loading="lazy" />
+              {/* PERF: Use Next.js Image component */}
+              <Image
+                src={categoryImage}
+                alt={categoryTitle}
+                width={1200}
+                height={400}
+                loading="lazy"
+                unoptimized={true}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1200" height="400"%3E%3Crect fill="%23f0f0f0" width="1200" height="400"/%3E%3C/svg%3E';
+                }}
+                style={{ objectFit: 'cover' }}
+              />
             </div>
           )}
         {categoryTitle !== "All Tattoos" && (
@@ -418,10 +506,10 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
               : "products-items"
           }
         >
-          {products.map((product) => {
+          {displayedProducts.map((product) => {
             const priceInfo = getPriceInfo(product);
             const productImages = getProductImages(product);
-            const currentImageIndex = selectedImageIndices[product.id] || 0;
+            const currentImageIndex = selectedImageIndicesState[product.id] ?? selectedImageIndices.current[product.id] ?? 0;
             const currentImage = productImages[currentImageIndex];
 
             return (
@@ -439,14 +527,20 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                   }
                   onMouseDown={(e) => handleImageMouseDown(product.id, e)}
                 >
-                  <img
+                  {/* PERF: Use Next.js Image component for better performance */}
+                  <Image
                     src={currentImage}
                     alt={product.title || product.name || "Product"}
                     className="carousel-image"
+                    width={400}
+                    height={400}
+                    loading="lazy"
+                    unoptimized={true}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
                         'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23f0f0f0" width="400" height="400"/%3E%3C/svg%3E';
                     }}
+                    style={{ objectFit: 'cover' }}
                   />
                   {productImages.length > 1 && (
                     <div className="product-image-dots">
@@ -537,6 +631,10 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
             );
           })}
         </div>
+        {/* PERF: Load more trigger for infinite scroll */}
+        {hasMore && (
+          <div ref={loadMoreRef} style={{ height: '20px', width: '100%' }} />
+        )}
       </div>
     </section>
   );

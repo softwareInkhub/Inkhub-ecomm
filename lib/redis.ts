@@ -8,9 +8,11 @@ const redis = new Redis({
   // 🔑 THIS IS THE WALL BETWEEN PROJECTS
   keyPrefix: process.env.REDIS_KEY_PREFIX || 'inkhub_ecomm:',
 
-  connectTimeout: 10000,
-  maxRetriesPerRequest: 3,
-  lazyConnect: false,
+  connectTimeout: 5000,
+  maxRetriesPerRequest: 1,
+  lazyConnect: true, // PERF: Don't connect immediately, connect on first use
+  retryStrategy: () => null, // PERF: Don't retry on connection failure
+  enableOfflineQueue: false, // PERF: Don't queue commands when offline
 })
 
 redis.on('connect', () => {
@@ -21,8 +23,13 @@ redis.on('ready', () => {
   console.log('🚀 Redis ready (NEW PROJECT)')
 })
 
+// PERF: Only log Redis errors once to reduce console noise
+let errorLogged = false
 redis.on('error', (err) => {
-  console.error('❌ Redis error (NEW PROJECT):', err)
+  if (!errorLogged) {
+    console.warn('⚠️ Redis not available (NEW PROJECT):', err.message)
+    errorLogged = true
+  }
 })
 // Graceful shutdown
 const shutdownRedis = async () => {

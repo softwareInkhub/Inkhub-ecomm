@@ -16,74 +16,116 @@ interface ShopifyProduct {
   variants?: Array<{ price: string }>
 }
 
+// PERF: Cache all products and per-category products separately
 let cachedProducts: Product[] | null = null
+let categoryCache: Record<string, Product[]> = {}
+let fetchPromise: Promise<Product[]> | null = null
 
 // Clear cache if needed (for development/testing)
 export const clearCache = (): void => {
   cachedProducts = null
+  categoryCache = {}
+  fetchPromise = null
 }
 
-export const fetchProducts = async (): Promise<Product[]> => {
-  if (cachedProducts) {
+// PERF: Fetch all products with deduplication to prevent multiple simultaneous requests
+export const fetchProducts = async (category?: string, page: number = 1, limit: number = 1000): Promise<Product[]> => {
+  // PERF: Return cached category products if available
+  if (category && category !== 'All Tattoos' && categoryCache[category]) {
+    return categoryCache[category]
+  }
+
+  // PERF: Return cached all products if available
+  if (!category && cachedProducts) {
     return cachedProducts
   }
 
-  try {
-    // Use server-side proxy API route to avoid CORS and rate limit issues
-    const response = await fetch('/api/products', { 
-      cache: 'no-store',
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+  // PERF: If a fetch is already in progress, wait for it instead of starting a new one
+  if (fetchPromise) {
+    const products = await fetchPromise
+    if (category && category !== 'All Tattoos') {
+      return products.filter(p => p.category === category)
     }
-    
-    const result = await response.json()
-    
-    // Handle both { data: [...] } and direct array formats
-    const productsData = (result?.data && Array.isArray(result.data)) 
-      ? result.data 
-      : (Array.isArray(result) ? result : [])
-    
-    if (productsData.length > 0) {
-      // First pass: categorize products
-      const categorizedProducts = productsData
-        .filter((product: ShopifyProduct) => product && product.handle && product.title) // Filter invalid products
-        .map((product: ShopifyProduct, index: number) => ({
-          id: product.id?.toString() || product.handle || '',
-          handle: product.handle || '',
-          title: product.title || 'Untitled Product',
-          name: product.title || 'Untitled Product',
-          desc: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 50) : (product.title || ''),
-          description: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 200) : (product.title || ''),
-          price: product.variants && product.variants[0] ? (parseFloat(product.variants[0].price) || 0) : 0,
-          image: (product.images && product.images[0] && product.images[0].src) || '',
-          images: (product.images && Array.isArray(product.images)) ? product.images.map((img: any) => img?.src || '').filter(Boolean) : [],
-          category: extractCategory(product.tags || '', index),
-          tags: product.tags || '',
-          fabric: 'Temporary Tattoo',
-          pattern: extractPattern(product.tags || ''),
-          fit: extractSize(product.tags || ''),
-          occasion: 'Body Art',
-          inStock: true,
-        }))
-        .filter((p: Product) => p.id && p.title) // Ensure required fields exist
-      
-      // Ensure each category has at least some products
-      cachedProducts = ensureCategoryDistribution(categorizedProducts)
-      
-      return cachedProducts
-    }
-    
-    return []
-  } catch (error) {
-    console.error('Error fetching products:', error)
-    // Return empty array on error to prevent UI crashes
-    return []
+    return products
   }
+
+  // PERF: Create a single fetch promise that can be shared
+  fetchPromise = (async () => {
+    try {
+      // PERF: Fetch with pagination support (use large limit to get all products)
+      const response = await fetch(`/api/products?page=${page}&limit=${limit}`, { 
+        cache: 'force-cache', // PERF: Use cache when possible
+        headers: {
+          'Accept': 'application/json',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const result = await response.json()
+      
+      // Handle both { data: [...] } and direct array formats
+      const productsData = (result?.data && Array.isArray(result.data)) 
+        ? result.data 
+        : (Array.isArray(result) ? result : [])
+      
+      if (productsData.length > 0) {
+        // First pass: categorize products
+        const categorizedProducts = productsData
+          .filter((product: ShopifyProduct) => product && product.handle && product.title) // Filter invalid products
+          .map((product: ShopifyProduct, index: number) => ({
+            id: product.id?.toString() || product.handle || '',
+            handle: product.handle || '',
+            title: product.title || 'Untitled Product',
+            name: product.title || 'Untitled Product',
+            desc: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 50) : (product.title || ''),
+            description: product.body_html ? product.body_html.replace(/<[^>]*>/g, '').substring(0, 200) : (product.title || ''),
+            price: product.variants && product.variants[0] ? (parseFloat(product.variants[0].price) || 0) : 0,
+            image: (product.images && product.images[0] && product.images[0].src) || '',
+            images: (product.images && Array.isArray(product.images)) ? product.images.map((img: any) => img?.src || '').filter(Boolean) : [],
+            category: extractCategory(product.tags || '', index),
+            tags: product.tags || '',
+            fabric: 'Temporary Tattoo',
+            pattern: extractPattern(product.tags || ''),
+            fit: extractSize(product.tags || ''),
+            occasion: 'Body Art',
+            inStock: true,
+          }))
+          .filter((p: Product) => p.id && p.title) // Ensure required fields exist
+        
+        // Ensure each category has at least some products
+        const finalProducts = ensureCategoryDistribution(categorizedProducts)
+        
+        // PERF: Cache all products
+        cachedProducts = finalProducts
+        
+        // PERF: Build category cache
+        const categories = [...new Set(finalProducts.map(p => p.category))]
+        categories.forEach(cat => {
+          categoryCache[cat] = finalProducts.filter(p => p.category === cat)
+        })
+        
+        fetchPromise = null // Clear promise after completion
+        return finalProducts
+      }
+      
+      fetchPromise = null
+      return []
+    } catch (error) {
+      fetchPromise = null
+      console.error('Error fetching products:', error)
+      // Return empty array on error to prevent UI crashes
+      return []
+    }
+  })()
+
+  const products = await fetchPromise
+  if (category && category !== 'All Tattoos') {
+    return products.filter(p => p.category === category)
+  }
+  return products
 }
 
 const ensureCategoryDistribution = (products: Product[]): Product[] => {
@@ -223,12 +265,27 @@ export const getProductById = async (id: string): Promise<Product | undefined> =
   return products.find(p => p.id === id || p.handle === id)
 }
 
-export const getProductsByCategory = async (category: string): Promise<Product[]> => {
-  const products = await fetchProducts()
+// PERF: Optimized category fetching with caching
+export const getProductsByCategory = async (category: string, page: number = 1, limit: number = 1000): Promise<Product[]> => {
+  // PERF: Use cached category data if available
+  if (category !== 'All Tattoos' && categoryCache[category]) {
+    const cached = categoryCache[category]
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
+    return cached.slice(startIndex, endIndex)
+  }
+
+  const products = await fetchProducts(category, page, limit)
   if (category === 'All Tattoos') {
     return products
   }
-  return products.filter(p => p.category === category)
+  
+  // PERF: Cache the filtered results
+  if (!categoryCache[category]) {
+    categoryCache[category] = products
+  }
+  
+  return products
 }
 
 export const searchProducts = async (query: string): Promise<Product[]> => {

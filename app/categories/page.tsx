@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import BottomNavbar from "@/components/BottomNavbar";
-import { fetchProducts, clearCache } from "@/lib/productsService";
+import { getProductsByCategory } from "@/lib/productsService";
 import type { Product } from "@/types";
 import Image from "next/image";
 
 export default function CategoriesPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("All Tattoos");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  // PERF: Store products per category instead of all products
+  const [categoryProducts, setCategoryProducts] = useState<Record<string, Product[]>>({});
+  const [loadingCategories, setLoadingCategories] = useState<Set<string>>(new Set());
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const categoryTitleRefs = useRef<Record<string, HTMLHeadingElement | null>>(
     {}
@@ -19,51 +20,74 @@ export default function CategoriesPage() {
   const sidebarItemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const sidebarRef = useRef<HTMLElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const categoryObserverRef = useRef<IntersectionObserver | null>(null);
   const isScrollingToCategory = useRef(false);
+  // PERF: Track which categories have been loaded to prevent duplicate fetches
+  const loadedCategoriesRef = useRef<Set<string>>(new Set());
+  const loadingPromisesRef = useRef<Record<string, Promise<void>>>({});
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        // Clear cache to get fresh data with updated categorization
-        clearCache();
-        const data = await fetchProducts();
-        setProducts(data);
-        console.log("Products loaded:", data.length);
-
-        // Log category distribution
-        const categories: Record<string, number> = {};
-        data.forEach((p) => {
-          categories[p.category] = (categories[p.category] || 0) + 1;
-        });
-        console.log("Category distribution:", categories);
-      } catch (error) {
-        console.error("Error loading products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProducts();
-  }, []);
-
-  // Get category thumbnail image from first product in that category
-  const getCategoryImage = (categoryName: string) => {
-    const categoryProducts =
-      categoryName === "All Tattoos"
-        ? products
-        : products.filter((p) => p.category === categoryName);
-
-    if (categoryProducts.length > 0 && categoryProducts[0].image) {
-      return categoryProducts[0].image;
+  // PERF: Load products for a specific category only when needed
+  const loadCategoryProducts = useCallback(async (categoryName: string) => {
+    // PERF: Skip if already loaded or currently loading
+    if (loadedCategoriesRef.current.has(categoryName) || loadingCategories.has(categoryName)) {
+      return;
     }
 
-    // Return first available product image as fallback
+    // PERF: If a load is already in progress, wait for it
+    const existingPromise = loadingPromisesRef.current[categoryName];
+    if (existingPromise) {
+      await existingPromise;
+      return;
+    }
+
+    setLoadingCategories(prev => new Set(prev).add(categoryName));
+
+    // PERF: Create and store the promise to prevent duplicate fetches
+    const loadPromise = (async () => {
+      try {
+        const products = await getProductsByCategory(categoryName);
+        setCategoryProducts(prev => ({
+          ...prev,
+          [categoryName]: products
+        }));
+        loadedCategoriesRef.current.add(categoryName);
+      } catch (error) {
+        console.error(`Error loading products for ${categoryName}:`, error);
+        setCategoryProducts(prev => ({
+          ...prev,
+          [categoryName]: []
+        }));
+      } finally {
+        setLoadingCategories(prev => {
+          const next = new Set(prev);
+          next.delete(categoryName);
+          return next;
+        });
+        delete loadingPromisesRef.current[categoryName];
+      }
+    })();
+
+    loadingPromisesRef.current[categoryName] = loadPromise;
+    await loadPromise;
+  }, [loadingCategories]);
+
+  // PERF: Get category thumbnail image from first product in that category
+  const getCategoryImage = useCallback((categoryName: string) => {
+    const products = categoryProducts[categoryName] || [];
+
     if (products.length > 0 && products[0].image) {
       return products[0].image;
     }
 
+    // PERF: Try to get image from any loaded category
+    const anyCategory = Object.values(categoryProducts).find(cat => cat.length > 0);
+    if (anyCategory && anyCategory[0]?.image) {
+      return anyCategory[0].image;
+    }
+
     // Transparent placeholder as last resort
     return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3C/svg%3E';
-  };
+  }, [categoryProducts]);
 
   const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
   const [hiddenPositions, setHiddenPositions] = useState<number[]>([]);
@@ -173,13 +197,20 @@ export default function CategoriesPage() {
           { id: "size-type", name: "Tattoos Size & Type" },
         ];
 
-  // Group products by category
-  const getProductsByCategory = (categoryName: string) => {
-    if (categoryName === "All Tattoos") {
-      return products;
+  // PERF: Load first visible category on mount
+  useEffect(() => {
+    if (categoriesLoaded && mainCategories.length > 0) {
+      const firstCategory = mainCategories[0].name;
+      if (firstCategory && !loadedCategoriesRef.current.has(firstCategory)) {
+        loadCategoryProducts(firstCategory);
+      }
     }
-    return products.filter((p) => p.category === categoryName);
-  };
+  }, [categoriesLoaded, mainCategories.length, loadCategoryProducts]);
+
+  // PERF: Get products for a category (from cached state)
+  const getProductsForCategory = useCallback((categoryName: string): Product[] => {
+    return categoryProducts[categoryName] || [];
+  }, [categoryProducts]);
 
   // Auto-scroll sidebar when category changes (from scrolling main content)
   useEffect(() => {
@@ -216,37 +247,52 @@ export default function CategoriesPage() {
     }
   }, [selectedCategory]);
 
-  // Intersection Observer to detect which category title is visible on screen
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (isScrollingToCategory.current) return;
+  // PERF: Create stable IntersectionObserver callback
+  const handleTitleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    if (isScrollingToCategory.current) return;
 
-        // Find all visible title entries
-        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
+    // Find all visible title entries
+    const visibleEntries = entries.filter((entry) => entry.isIntersecting);
 
-        if (visibleEntries.length > 0) {
-          // Find the title closest to the top of the viewport
-          const topEntry = visibleEntries.reduce((closest, entry) => {
-            const closestTop = Math.abs(closest.boundingClientRect.top);
-            const entryTop = Math.abs(entry.boundingClientRect.top);
-            return entryTop < closestTop ? entry : closest;
-          });
+    if (visibleEntries.length > 0) {
+      // Find the title closest to the top of the viewport
+      const topEntry = visibleEntries.reduce((closest, entry) => {
+        const closestTop = Math.abs(closest.boundingClientRect.top);
+        const entryTop = Math.abs(entry.boundingClientRect.top);
+        return entryTop < closestTop ? entry : closest;
+      });
 
-          const categoryName = topEntry.target.getAttribute("data-category");
-          if (categoryName) {
-            setSelectedCategory(categoryName);
-          }
+      const categoryName = topEntry.target.getAttribute("data-category");
+      if (categoryName) {
+        setSelectedCategory(categoryName);
+      }
+    }
+  }, []);
+
+  // PERF: Create stable IntersectionObserver for category visibility (to load products)
+  const handleCategoryVisibility = useCallback((entries: IntersectionObserverEntry[]) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const categoryName = entry.target.getAttribute("data-category");
+        if (categoryName && !loadedCategoriesRef.current.has(categoryName)) {
+          loadCategoryProducts(categoryName);
         }
-      },
-      {
+      }
+    });
+  }, [loadCategoryProducts]);
+
+  // PERF: Intersection Observer to detect which category title is visible on screen
+  useEffect(() => {
+    // PERF: Reuse observer if it exists
+    if (!observerRef.current) {
+      observerRef.current = new IntersectionObserver(handleTitleIntersection, {
         root: null,
         rootMargin: "-80px 0px -80% 0px", // Trigger when title is near top of screen
         threshold: [0, 1],
-      }
-    );
+      });
+    }
 
-    // Observe all category title elements
+    // PERF: Observe all category title elements
     Object.keys(categoryTitleRefs.current).forEach((key) => {
       if (categoryTitleRefs.current[key]) {
         observerRef.current?.observe(categoryTitleRefs.current[key]!);
@@ -256,14 +302,45 @@ export default function CategoriesPage() {
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
+        observerRef.current = null;
       }
     };
-  }, [products]);
+  }, [handleTitleIntersection, mainCategories.length]); // PERF: Only recreate when categories change
 
-  // Handle sidebar category click - scroll to category
-  const handleCategoryClick = (categoryName: string) => {
+  // PERF: Intersection Observer to load category products when they become visible
+  useEffect(() => {
+    if (!categoryObserverRef.current) {
+      categoryObserverRef.current = new IntersectionObserver(handleCategoryVisibility, {
+        root: null,
+        rootMargin: "200px 0px", // PERF: Start loading 200px before category becomes visible
+        threshold: 0.1,
+      });
+    }
+
+    // PERF: Observe category containers for lazy loading
+    Object.keys(categoryRefs.current).forEach((key) => {
+      if (categoryRefs.current[key]) {
+        categoryObserverRef.current?.observe(categoryRefs.current[key]!);
+      }
+    });
+
+    return () => {
+      if (categoryObserverRef.current) {
+        categoryObserverRef.current.disconnect();
+        categoryObserverRef.current = null;
+      }
+    };
+  }, [handleCategoryVisibility, mainCategories.length]);
+
+  // PERF: Handle sidebar category click - scroll to category and ensure products are loaded
+  const handleCategoryClick = useCallback((categoryName: string) => {
     isScrollingToCategory.current = true;
     setSelectedCategory(categoryName);
+
+    // PERF: Load products for this category if not already loaded
+    if (!loadedCategoriesRef.current.has(categoryName)) {
+      loadCategoryProducts(categoryName);
+    }
 
     const targetElement = categoryRefs.current[categoryName];
     if (targetElement) {
@@ -274,7 +351,7 @@ export default function CategoriesPage() {
         isScrollingToCategory.current = false;
       }, 1000);
     }
-  };
+  }, [loadCategoryProducts]);
 
   return (
     <div className="categories-page">
@@ -372,14 +449,19 @@ export default function CategoriesPage() {
               onClick={() => handleCategoryClick(category.name)}
             >
               <div className="category-sidebar-thumbnail">
-                <img
+                {/* PERF: Use Next.js Image component for better performance */}
+                <Image
                   src={getCategoryImage(category.name)}
                   alt={category.name}
+                  width={60}
+                  height={60}
+                  loading="lazy"
+                  unoptimized={true}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src =
                       'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3C/svg%3E';
                   }}
-                  loading="lazy"
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
               <span className="category-sidebar-name">{category.name}</span>
@@ -388,68 +470,77 @@ export default function CategoriesPage() {
         </aside>
 
         <main className="categories-main">
-          {loading ? (
-            <div className="categories-loading">
-              <p>Loading products...</p>
-            </div>
-          ) : (
-            <div data-section-id="category-list">
-              {mainCategories.map((category, index) => {
-                const categoryProducts = getProductsByCategory(category.name);
-                return (
-                  <div
-                    key={`${category.id}-${index}`}
+          <div data-section-id="category-list">
+            {mainCategories.map((category, index) => {
+              const products = getProductsForCategory(category.name);
+              const isLoading = loadingCategories.has(category.name);
+              const hasLoaded = loadedCategoriesRef.current.has(category.name);
+              
+              return (
+                <div
+                  key={`${category.id}-${index}`}
+                  ref={(el) => {
+                    if (el) {
+                      categoryRefs.current[category.name] = el;
+                      el.setAttribute("data-category", category.name);
+                    }
+                  }}
+                  className="category-section-container"
+                >
+                  <h2
+                    className="category-section-title"
                     ref={(el) => {
-                      if (el) categoryRefs.current[category.name] = el;
+                      if (el) categoryTitleRefs.current[category.name] = el;
                     }}
-                    className="category-section-container"
+                    data-category={category.name}
                   >
-                    <h2
-                      className="category-section-title"
-                      ref={(el) => {
-                        if (el) categoryTitleRefs.current[category.name] = el;
-                      }}
-                      data-category={category.name}
-                    >
-                      {category.name}
-                    </h2>
-                    <div className="subcategories-grid">
-                      {categoryProducts.length > 0 ? (
-                        categoryProducts.map((product, idx) => (
-                          <div
-                            key={`${product.id}-${idx}`}
-                            className="subcategory-card"
-                            onClick={() =>
-                              router.push(`/product/${product.id}`)
-                            }
-                          >
-                            <div className="subcategory-image">
-                              <img
-                                src={product.image}
-                                alt={product.title || product.name || "Product"}
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src =
-                                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23f0f0f0" width="150" height="150"/%3E%3C/svg%3E';
-                                }}
-                                loading="lazy"
-                              />
-                            </div>
-                            <p className="subcategory-name">
-                              {product.title || product.name}
-                            </p>
+                    {category.name}
+                  </h2>
+                  <div className="subcategories-grid">
+                    {isLoading && !hasLoaded ? (
+                      <div className="categories-loading">
+                        <p>Loading products...</p>
+                      </div>
+                    ) : products.length > 0 ? (
+                      products.map((product, idx) => (
+                        <div
+                          key={`${product.id}-${idx}`}
+                          className="subcategory-card"
+                          onClick={() =>
+                            router.push(`/product/${product.id}`)
+                          }
+                        >
+                          <div className="subcategory-image">
+                            {/* PERF: Use Next.js Image component for better performance */}
+                            <Image
+                              src={product.image}
+                              alt={product.title || product.name || "Product"}
+                              width={150}
+                              height={150}
+                              loading="lazy"
+                              unoptimized={true}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23f0f0f0" width="150" height="150"/%3E%3C/svg%3E';
+                              }}
+                              style={{ objectFit: 'cover' }}
+                            />
                           </div>
-                        ))
-                      ) : (
-                        <p className="no-products">
-                          No products in this category yet
-                        </p>
-                      )}
-                    </div>
+                          <p className="subcategory-name">
+                            {product.title || product.name}
+                          </p>
+                        </div>
+                      ))
+                    ) : hasLoaded ? (
+                      <p className="no-products">
+                        No products in this category yet
+                      </p>
+                    ) : null}
                   </div>
-                );
-              })}
-            </div>
-          )}
+                </div>
+              );
+            })}
+          </div>
         </main>
       </div>
 
