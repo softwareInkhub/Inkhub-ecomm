@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { sendOTP } from '@/lib/otpService'
 
 interface LoginModalProps {
   show: boolean
@@ -11,17 +12,41 @@ interface LoginModalProps {
 const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onSuccess }) => {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [isSendingOTP, setIsSendingOTP] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '')
     setPhoneNumber(value.slice(0, 10))
+    setErrorMessage('') // Clear error when user types
   }
   
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (phoneNumber.length === 10) {
-      localStorage.setItem('bagichaPhoneNumber', phoneNumber)
-      localStorage.setItem('bagichaUserPhone', phoneNumber)
-      onSuccess()
+      setIsSendingOTP(true)
+      setErrorMessage('')
+      
+      try {
+        // Save phone number to localStorage
+        localStorage.setItem('bagichaPhoneNumber', phoneNumber)
+        localStorage.setItem('bagichaUserPhone', phoneNumber)
+        
+        // Send OTP using Firebase
+        const result = await sendOTP(phoneNumber)
+        
+        if (result.success) {
+          // OTP sent successfully, navigate to OTP page
+          onSuccess()
+        } else {
+          // Show error message
+          setErrorMessage(result.error || 'Failed to send OTP. Please try again.')
+          setIsSendingOTP(false)
+        }
+      } catch (error: any) {
+        console.error('Error in handleContinue:', error)
+        setErrorMessage('An unexpected error occurred. Please try again.')
+        setIsSendingOTP(false)
+      }
     }
   }
 
@@ -72,19 +97,27 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onSuccess }) => 
               placeholder="Enter your phone number"
               maxLength={10}
               autoFocus
+              disabled={isSendingOTP}
             />
           </div>
+          {errorMessage && (
+            <p className="error-message" style={{ color: 'red', fontSize: '14px', marginTop: '8px', textAlign: 'center' }}>
+              {errorMessage}
+            </p>
+          )}
           <p className="otp-note">An OTP will be sent to your phone number</p>
           <p className="terms-text">
             By clicking I accept the <a href="#" className="terms-link">Terms and Conditions</a> and <a href="#" className="terms-link">Privacy Policy</a>
           </p>
           <button 
             className="continue-btn" 
-            disabled={phoneNumber.length !== 10}
+            disabled={phoneNumber.length !== 10 || isSendingOTP}
             onClick={handleContinue}
           >
-            Continue
+            {isSendingOTP ? 'Sending OTP...' : 'Continue'}
           </button>
+          {/* reCAPTCHA container for Firebase Phone Auth */}
+          <div id="recaptcha-container"></div>
         </div>
       </div>
 

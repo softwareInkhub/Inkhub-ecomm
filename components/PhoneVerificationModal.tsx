@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { sendOTP, verifyOTP } from '@/lib/otpService'
 
 interface PhoneVerificationModalProps {
   isOpen: boolean
@@ -14,26 +15,56 @@ export default function PhoneVerificationModal({ isOpen, onClose, currentPhone, 
   const [otp, setOtp] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [verifyingOtp, setVerifyingOtp] = useState(false)
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   if (!isOpen) return null
 
-  const handleConfirm = () => {
-    // Send OTP to current number
-    alert('OTP sent to your registered number')
-    setStep(2)
+  const handleConfirm = async () => {
+    // Send OTP to current number using Firebase
+    setSendingOtp(true)
+    setErrorMessage('')
+    
+    try {
+      const result = await sendOTP(currentPhone)
+      if (result.success) {
+        setStep(2)
+      } else {
+        setErrorMessage(result.error || 'Failed to send OTP. Please try again.')
+      }
+    } catch (error: any) {
+      console.error('Error sending OTP:', error)
+      setErrorMessage('An unexpected error occurred. Please try again.')
+    } finally {
+      setSendingOtp(false)
+    }
   }
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     if (otp.length !== 6) {
-      alert('Please enter a valid 6-digit OTP')
+      setErrorMessage('Please enter a valid 6-digit OTP')
       return
     }
+    
     setVerifyingOtp(true)
-    // Simulate OTP verification
-    setTimeout(() => {
+    setErrorMessage('')
+    
+    try {
+      // Verify OTP using Firebase
+      const result = await verifyOTP(otp)
+      if (result.success) {
+        // OTP verified successfully, proceed to step 3
+        setVerifyingOtp(false)
+        setStep(3)
+      } else {
+        setErrorMessage(result.error || 'Invalid OTP. Please try again.')
+        setVerifyingOtp(false)
+      }
+    } catch (error: any) {
+      console.error('Error verifying OTP:', error)
+      setErrorMessage('An unexpected error occurred. Please try again.')
       setVerifyingOtp(false)
-      setStep(3)
-    }, 1000)
+    }
   }
 
   const handleUpdateNumber = () => {
@@ -53,6 +84,8 @@ export default function PhoneVerificationModal({ isOpen, onClose, currentPhone, 
     setOtp('')
     setNewPhone('')
     setVerifyingOtp(false)
+    setSendingOtp(false)
+    setErrorMessage('')
     onClose()
   }
 
@@ -68,8 +101,17 @@ export default function PhoneVerificationModal({ isOpen, onClose, currentPhone, 
               For added security, we'll send an OTP to your registered number
             </p>
             <div className="phone-verify-number">+91-{currentPhone}</div>
-            <button className="phone-verify-confirm-btn" onClick={handleConfirm}>
-              Confirm
+            {errorMessage && (
+              <p className="error-message" style={{ color: 'red', fontSize: '14px', marginTop: '8px', textAlign: 'center' }}>
+                {errorMessage}
+              </p>
+            )}
+            <button 
+              className="phone-verify-confirm-btn" 
+              onClick={handleConfirm}
+              disabled={sendingOtp}
+            >
+              {sendingOtp ? 'Sending OTP...' : 'Confirm'}
             </button>
           </>
         )}
@@ -86,12 +128,21 @@ export default function PhoneVerificationModal({ isOpen, onClose, currentPhone, 
               placeholder="Enter OTP"
               maxLength={6}
               value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+              onChange={(e) => {
+                setOtp(e.target.value.replace(/\D/g, ''))
+                setErrorMessage('') // Clear error when user types
+              }}
+              disabled={verifyingOtp}
             />
+            {errorMessage && (
+              <p className="error-message" style={{ color: 'red', fontSize: '14px', marginTop: '8px', textAlign: 'center' }}>
+                {errorMessage}
+              </p>
+            )}
             <button 
               className="phone-verify-confirm-btn" 
               onClick={handleVerifyOtp}
-              disabled={verifyingOtp}
+              disabled={verifyingOtp || otp.length !== 6}
             >
               {verifyingOtp ? 'Verifying...' : 'Verify OTP'}
             </button>
@@ -123,6 +174,9 @@ export default function PhoneVerificationModal({ isOpen, onClose, currentPhone, 
             </button>
           </>
         )}
+        
+        {/* reCAPTCHA container for Firebase Phone Auth - always available when modal is open */}
+        <div id="recaptcha-container" style={{ display: 'none' }}></div>
       </div>
     </div>
   )

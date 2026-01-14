@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { verifyOTP, resendOTP } from '@/lib/otpService'
 
 export default function OTPPage() {
   const router = useRouter()
@@ -9,6 +10,9 @@ export default function OTPPage() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [showNameInput, setShowNameInput] = useState(false)
   const [userName, setUserName] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isResending, setIsResending] = useState(false)
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -41,22 +45,41 @@ export default function OTPPage() {
     }
   }
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const otpString = otp.join('')
     if (otpString.length === 6) {
-      localStorage.setItem('Inkhubuthenticated', 'true')
+      setIsVerifying(true)
+      setErrorMessage('')
       
-      // Save phone number for payment system
-      localStorage.setItem('bagichaUserPhone', phoneNumber)
-      
-      // Check if user already has a name saved
-      const savedName = localStorage.getItem('bagichaUserName')
-      if (!savedName) {
-        // First time login - ask for name
-        setShowNameInput(true)
-      } else {
-        // User already has name - proceed
-        completeLogin()
+      try {
+        // Verify OTP using Firebase
+        const result = await verifyOTP(otpString)
+        
+        if (result.success) {
+          // OTP verified successfully
+          localStorage.setItem('Inkhubuthenticated', 'true')
+          
+          // Save phone number for payment system
+          localStorage.setItem('bagichaUserPhone', phoneNumber)
+          
+          // Check if user already has a name saved
+          const savedName = localStorage.getItem('bagichaUserName')
+          if (!savedName) {
+            // First time login - ask for name
+            setShowNameInput(true)
+          } else {
+            // User already has name - proceed
+            completeLogin()
+          }
+        } else {
+          // Show error message
+          setErrorMessage(result.error || 'Invalid OTP. Please try again.')
+          setIsVerifying(false)
+        }
+      } catch (error: any) {
+        console.error('Error in handleVerify:', error)
+        setErrorMessage('An unexpected error occurred. Please try again.')
+        setIsVerifying(false)
       }
     }
   }
@@ -171,16 +194,41 @@ export default function OTPPage() {
             ))}
           </div>
           
+          {errorMessage && (
+            <p className="error-message" style={{ color: 'red', fontSize: '14px', marginTop: '8px', textAlign: 'center' }}>
+              {errorMessage}
+            </p>
+          )}
           <p className="resend-text">
-            Didn't receive the code? <a href="#" className="resend-link" onClick={(e) => {
+            Didn't receive the code? <a href="#" className="resend-link" onClick={async (e) => {
               e.preventDefault()
-              alert('OTP resent')
-            }}>Resend</a>
+              if (isResending) return
+              setIsResending(true)
+              setErrorMessage('')
+              try {
+                const result = await resendOTP(phoneNumber)
+                if (result.success) {
+                  alert('OTP resent successfully')
+                } else {
+                  setErrorMessage(result.error || 'Failed to resend OTP. Please try again.')
+                }
+              } catch (error: any) {
+                console.error('Error resending OTP:', error)
+                setErrorMessage('Failed to resend OTP. Please try again.')
+              } finally {
+                setIsResending(false)
+              }
+            }}>
+              {isResending ? 'Resending...' : 'Resend'}
+            </a>
           </p>
           
-          <button className="verify-btn" disabled={!isOtpComplete} onClick={handleVerify}>
-            Verify OTP
+          <button className="verify-btn" disabled={!isOtpComplete || isVerifying} onClick={handleVerify}>
+            {isVerifying ? 'Verifying...' : 'Verify OTP'}
           </button>
+          
+          {/* reCAPTCHA container for Firebase Phone Auth - needed for resend functionality */}
+          <div id="recaptcha-container" style={{ display: 'none' }}></div>
         </div>
       </div>
     </div>
