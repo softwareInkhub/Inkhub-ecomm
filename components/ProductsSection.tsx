@@ -506,7 +506,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
               : "products-items"
           }
         >
-          {displayedProducts.map((product) => {
+          {displayedProducts.map((product, index) => {
             const priceInfo = getPriceInfo(product);
             const productImages = getProductImages(product);
             const currentImageIndex = selectedImageIndicesState[product.id] ?? selectedImageIndices.current[product.id] ?? 0;
@@ -514,7 +514,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 
             return (
               <div
-                key={product.id}
+                key={`${product.id}-${index}`}
                 className="wishlist-item"
                 onClick={() => handleProductClick(product)}
               >

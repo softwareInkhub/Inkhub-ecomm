@@ -34,7 +34,7 @@ export default function ProfilePage() {
         if (phone && phone.length === 10) {
           setPhoneNumber(`XXXXXX${phone.slice(-4)}`)
         } else {
-          setPhoneNumber('XXXXXX8553')
+          setPhoneNumber('XXXXXX1234')
         }
         
         // Get order count and total spent from localStorage (or default to 0)

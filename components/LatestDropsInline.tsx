@@ -43,7 +43,7 @@ const LatestDropsInline: React.FC = () => {
           fontSize: '32px',
           fontWeight: '700',
           marginBottom: '24px',
-          color: '#2d3748',
+          color: '#fff',
           fontFamily: "'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           letterSpacing: '-0.5px',
           margin: '0 0 24px 0'

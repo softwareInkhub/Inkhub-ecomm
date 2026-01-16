@@ -55,21 +55,71 @@ export default function OTPPage() {
         // Verify OTP using Firebase
         const result = await verifyOTP(otpString)
         
-        if (result.success) {
+        if (result.success && result.user) {
           // OTP verified successfully
+          const firebaseUser = result.user
+          const uid = firebaseUser.uid
+          const phone = firebaseUser.phoneNumber || `+91${phoneNumber}`
+          
+          // Save to localStorage
           localStorage.setItem('Inkhubuthenticated', 'true')
-          
-          // Save phone number for payment system
           localStorage.setItem('bagichaUserPhone', phoneNumber)
+          localStorage.setItem('firebaseUID', uid)
           
-          // Check if user already has a name saved
-          const savedName = localStorage.getItem('bagichaUserName')
-          if (!savedName) {
-            // First time login - ask for name
-            setShowNameInput(true)
-          } else {
-            // User already has name - proceed
-            completeLogin()
+          // Save or fetch user from DynamoDB
+          try {
+            const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`
+            const userResponse = await fetch('/api/users', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id: uid,
+                phone: formattedPhone,
+              }),
+            })
+            
+            const userData = await userResponse.json()
+            
+            if (userData.success && userData.user) {
+              // User saved/fetched successfully
+              // If user has a name, save it to localStorage
+              if (userData.user.name) {
+                localStorage.setItem('bagichaUserName', userData.user.name)
+              }
+              
+              // Check if user already has a name saved
+              const savedName = localStorage.getItem('bagichaUserName')
+              if (!savedName) {
+                // First time login - ask for name
+                setShowNameInput(true)
+                setIsVerifying(false)
+              } else {
+                // User already has name - proceed
+                completeLogin()
+              }
+            } else {
+              // DynamoDB save failed, but continue with login
+              console.warn('Failed to save user to DynamoDB:', userData.error)
+              const savedName = localStorage.getItem('bagichaUserName')
+              if (!savedName) {
+                setShowNameInput(true)
+                setIsVerifying(false)
+              } else {
+                completeLogin()
+              }
+            }
+          } catch (dbError: any) {
+            // DynamoDB error - log but don't block login
+            console.error('Error saving user to DynamoDB:', dbError)
+            const savedName = localStorage.getItem('bagichaUserName')
+            if (!savedName) {
+              setShowNameInput(true)
+              setIsVerifying(false)
+            } else {
+              completeLogin()
+            }
           }
         } else {
           // Show error message
@@ -84,9 +134,35 @@ export default function OTPPage() {
     }
   }
 
-  const handleNameSubmit = () => {
+  const handleNameSubmit = async () => {
     if (userName.trim()) {
-      localStorage.setItem('bagichaUserName', userName.trim())
+      const name = userName.trim()
+      localStorage.setItem('bagichaUserName', name)
+      
+      // Update user in DynamoDB with name
+      const uid = localStorage.getItem('firebaseUID')
+      const phone = localStorage.getItem('bagichaUserPhone')
+      
+      if (uid && phone) {
+        try {
+          const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`
+          await fetch('/api/users', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: uid,
+              phone: formattedPhone,
+              name: name,
+            }),
+          })
+        } catch (error) {
+          // Log error but don't block login
+          console.error('Error updating user name in DynamoDB:', error)
+        }
+      }
+      
       completeLogin()
     }
   }

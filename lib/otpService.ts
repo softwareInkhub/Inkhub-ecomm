@@ -14,27 +14,54 @@ export const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; 
 
     const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`
 
+    // Clear existing verifier if present
     if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear()
+      try {
+        window.recaptchaVerifier.clear()
+      } catch {
+        // ignore
+      }
+      window.recaptchaVerifier = undefined
     }
 
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      'recaptcha-container',
-      {
-        size: 'invisible',
-        callback: () => console.log('reCAPTCHA solved'),
-        'expired-callback': () => console.warn('reCAPTCHA expired'),
-      }
-    )
+    // Ensure reCAPTCHA container exists
+    let container = document.getElementById('recaptcha-container')
+    if (!container) {
+      container = document.createElement('div')
+      container.id = 'recaptcha-container'
+      container.style.display = 'none'
+      document.body.appendChild(container)
+    }
+
+    // Wait a bit to ensure DOM is ready
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // Create and render new verifier
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible',
+      callback: () => console.log('reCAPTCHA solved'),
+      'expired-callback': () => {
+        console.warn('reCAPTCHA expired')
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear()
+          window.recaptchaVerifier = undefined
+        }
+      },
+    })
+    await window.recaptchaVerifier.render() // ✅ ensure verifier is active
 
     const appVerifier = window.recaptchaVerifier
+    if (!appVerifier) throw new Error('reCAPTCHA not initialized')
+
     confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier)
     return { success: true }
+
   } catch (error: any) {
     console.error('Error sending OTP:', error)
     if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear()
+      try {
+        window.recaptchaVerifier.clear()
+      } catch {}
       window.recaptchaVerifier = undefined
     }
 
@@ -44,12 +71,14 @@ export const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; 
     } else if (error.code === 'auth/too-many-requests') {
       errorMessage = 'Too many requests. Please try again later.'
     } else if (error.code === 'auth/invalid-app-credential') {
-      errorMessage = 'Invalid app credential. Check Firebase config or domain settings.'
+      errorMessage =
+        'Invalid app credential. Make sure Firebase is initialized once and localhost is authorized in Firebase Console.'
     }
 
     return { success: false, error: errorMessage }
   }
 }
+
 
 export const verifyOTP = async (otp: string): Promise<{ success: boolean; user?: any; error?: any }> => {
   try {
