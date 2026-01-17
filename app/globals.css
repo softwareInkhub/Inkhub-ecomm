@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=TASA+Explorer:wght@400..800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
+
 /* Root theme - Custom Colors - Dark Theme */
 :root {
-  --bg: #1a1a1a;
+  --bg: #171717;
   --bg-elev: #2d2d2d;
   --bg-section: #252525;
   --bg-warm: #1f1f1f;
@@ -31,6 +34,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+ font-family: "Outfit", sans-serif;
 }
 
 html,
@@ -54,7 +58,6 @@ body {
 
 body {
   margin: 0;
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.5;
@@ -92,7 +95,7 @@ button {
 
 /* Main Content */
 .main-content {
-  padding-top: 8px;
+  padding-top: 0;
   padding-bottom: 100px;
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a1a 0%, #252525 50%, #1a1a1a 100%);
@@ -205,9 +208,8 @@ button {
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: 20px;
-  font-family: "Inter", sans-serif;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 150px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -260,7 +262,6 @@ button {
 
 .see-all-categories-text {
   text-align: center;
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
@@ -329,7 +330,6 @@ button {
 }
 
 .wishlist-title {
-  font-family: "Inter", sans-serif;
   font-size: 28px;
   font-weight: 500;
   color: var(--text);
@@ -387,7 +387,6 @@ button {
 }
 
 .products-items-grid .wishlist-item-name {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
@@ -403,7 +402,6 @@ button {
 
 .products-items-grid .wishlist-item-desc {
   margin-bottom: 8px;
-  font-family: "Inter", sans-serif;
   font-size: 12px;
   font-weight: 400;
   color: var(--text-light);
@@ -440,7 +438,6 @@ button {
 }
 
 .products-items-grid .wishlist-item-price {
-  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
 }
@@ -586,7 +583,6 @@ button {
 }
 
 .wishlist-item-name {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
@@ -597,7 +593,6 @@ button {
 }
 
 .wishlist-item-desc {
-  font-family: "Inter", sans-serif;
   font-size: 12px;
   font-weight: 400;
   color: var(--text-light);
@@ -629,14 +624,12 @@ button {
 }
 
 .wishlist-item-price {
-  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
 }
 
 .wishlist-discount-badge {
-  font-family: "Inter", sans-serif;
   font-size: 9px;
   font-weight: 500;
   color: #3b82f6;
@@ -648,7 +641,6 @@ button {
 }
 
 .wishlist-previous-price {
-  font-family: "Inter", sans-serif;
   font-size: 11px;
   font-weight: 400;
   color: var(--text-light);
@@ -695,21 +687,20 @@ button {
 }
 
 .categories-header {
-  background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+  background:#171717;
   padding: 14px 20px;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
 }
 
 .categories-title {
-  font-family: "Inter", sans-serif;
-  font-size: 22px;
+  font-size: 27px;
   font-weight: 500;
   color: var(--text);
   margin: 0;
@@ -757,7 +748,7 @@ button {
 
 .categories-sidebar {
   width: 120px;
-  background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+  background:#171717;
   border-right: 1px solid rgba(59, 130, 246, 0.2);
   overflow-y: auto;
   padding: 92px 0;
@@ -842,7 +833,6 @@ button {
 }
 
 .category-sidebar-name {
-  font-family: "Inter", sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: var(--text);
@@ -871,7 +861,6 @@ button {
 }
 
 .category-section-title {
-  font-family: "Inter", sans-serif;
   font-size: 18px;
   font-weight: 500;
   color: var(--text);
@@ -961,7 +950,6 @@ button {
 }
 
 .subcategory-name {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text);
@@ -1307,17 +1295,17 @@ body.search-page {
 
 .search-page {
   min-height: 100vh;
-  background: var(--bg-section);
+  
 }
 
 .search-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--bg-section);
+background: #171717;
   backdrop-filter: blur(10px);
   box-shadow: none;
-  border-bottom: none;
+  border-bottom: 1px solid #3b3b3b;
 }
 
 .search-header-content {
@@ -1325,6 +1313,7 @@ body.search-page {
   align-items: center;
   gap: 0;
   padding: 12px 20px;
+
 }
 
 .search-header .back-btn {
@@ -1426,7 +1415,7 @@ body.search-page {
 .search-main {
   padding: 24px 0;
   min-height: calc(100vh - 70px);
-  background: var(--bg-section);
+  background: #171717;
 }
 
 .search-content {
@@ -1523,14 +1512,14 @@ body.wishlist-page {
 
 .wishlist-page {
   min-height: 100vh;
-  background: var(--bg-section);
+
 }
 
 .wishlist-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--card-bg);
+  background: #171717;
   backdrop-filter: blur(10px);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   border-bottom: 1px solid var(--border);
@@ -1551,7 +1540,6 @@ body.wishlist-page {
 }
 
 .wishlist-logo {
-  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--text);
@@ -1570,7 +1558,7 @@ body.wishlist-page {
 .wishlist-main {
   padding: 24px 20px;
   min-height: calc(100vh - 70px);
-  background: var(--bg-section);
+ background: #171717;
 }
 
 .wishlist-content {
@@ -1579,7 +1567,6 @@ body.wishlist-page {
 }
 
 .wishlist-title {
-  font-family: "Inter", sans-serif;
   font-size: 28px;
   font-weight: 500;
   color: var(--text);
@@ -1610,7 +1597,6 @@ body.wishlist-page {
   border-radius: 24px;
   background: var(--card-bg);
   color: var(--text-light);
-  font-family: "Inter", sans-serif;
   font-weight: 300;
   font-size: 13px;
   cursor: pointer;
@@ -1647,7 +1633,6 @@ body.wishlist-page {
 }
 
 .empty-state-title {
-  font-family: "Inter", sans-serif;
   font-size: 22px;
   font-weight: 500;
   color: var(--text);
@@ -1655,7 +1640,6 @@ body.wishlist-page {
 }
 
 .empty-state-text {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: var(--text-light);
@@ -1665,10 +1649,9 @@ body.wishlist-page {
 
 .start-shopping-btn {
   padding: 14px 32px;
-  background: #3b82f6;
+  background:#6678ff;
   color: white;
-  border-radius: 26px;
-  font-family: "Inter", sans-serif;
+  border-radius: 14px;
   font-weight: 500;
   font-size: 15px;
   transition: all 0.2s;
@@ -1821,10 +1804,10 @@ body.wishlist-page {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
+  background: #171717;
   backdrop-filter: blur(10px);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  border-bottom: 1px solid var(--border);
+   border-bottom: 1px solid #292929;
 }
 
 .profile-header-content {
@@ -1837,11 +1820,11 @@ body.wishlist-page {
 }
 
 .profile-header-title {
-  font-size: 25px;
-  font-weight: 500;
+  font-size: 27px;
+  font-weight: 600;
   color: var(--text);
   flex: 1;
-  text-align: center;
+  text-align: left;
   letter-spacing: 0.3px;
 }
 
@@ -1852,9 +1835,9 @@ body.wishlist-page {
 }
 
 .profile-login-prompt {
-  background: #e5e5e5;
-  border-radius: 16px;
-  padding: 32px 24px;
+  background: #8b8b8b;
+  border-radius: 18px;
+  padding: 82px 24px;
   margin-bottom: 24px;
   text-align: center;
   cursor: pointer;
@@ -1862,7 +1845,7 @@ body.wishlist-page {
 }
 
 .profile-login-prompt:hover {
-  background: #d8d8d8;
+
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
@@ -1872,18 +1855,21 @@ body.wishlist-page {
 }
 
 .profile-login-title {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--text);
   margin: 0 0 12px 0;
   line-height: 1.3;
+    text-align: left;
 }
 
 .profile-login-subtitle {
-  font-size: 14px;
-  color: var(--text-light);
+  font-size: 13px;
+  color:#ffffff;
+  font-weight: 500;
   margin: 0;
   line-height: 1.5;
+    text-align: left;
 }
 
 .profile-card {
@@ -1979,41 +1965,47 @@ body.wishlist-page {
   color: var(--text);
 }
 
+.profile-action-grid-wrapper {
+  margin-bottom: 24px;
+}
+
 .profile-action-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 24px;
 }
 
 .profile-action-btn {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px 16px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  min-height: auto;
 }
 
 .profile-action-btn:hover {
-  background: #f8faf9;
+  background: var(--bg-section);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
 .profile-action-btn svg {
   color: var(--text);
+  flex-shrink: 0;
 }
 
 .profile-action-btn span {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
+  text-align: left;
 }
 
 .profile-settings-list {
@@ -2031,7 +2023,7 @@ body.wishlist-page {
   padding: 16px 20px;
   background: var(--card-bg);
   border: none;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #383838;
   cursor: pointer;
   transition: background 0.2s;
   text-align: left;
@@ -2041,9 +2033,7 @@ body.wishlist-page {
   border-bottom: none;
 }
 
-.profile-settings-item:hover {
-  background: #f8faf9;
-}
+
 
 .profile-settings-item-left {
   display: flex;
@@ -2140,7 +2130,7 @@ body.wishlist-page {
   font-size: 24px;
   font-weight: 700;
   color: var(--text);
-  text-align: center;
+  text-align: left;
   margin: 0;
 }
 
@@ -2151,7 +2141,6 @@ body.wishlist-page {
 .phone-input-container {
   display: flex;
   align-items: center;
-  border: 2px solid #e0e0e0;
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 16px;
@@ -2168,7 +2157,6 @@ body.wishlist-page {
   background: var(--card-bg);
   color: var(--text);
   font-weight: 600;
-  border-right: 1px solid #e0e0e0;
   flex-shrink: 0;
 }
 
@@ -2210,25 +2198,25 @@ body.wishlist-page {
 
 .continue-btn {
   width: 100%;
-  padding: 16px;
+  padding: 14px 18px;
   background: #6366f1;
   color: white;
   border-radius: 12px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 19px;
   transition: all 0.2s;
   cursor: pointer;
   border: none;
 }
 
 .continue-btn:disabled {
-  background: #d1d5db;
-  color: var(--text-light);
+  background: #a3a3a3;
+  color: #ffffff;
   cursor: not-allowed;
 }
 
 .continue-btn:not(:disabled):hover {
-  background: #000000;
+background: #4f46e5;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -2272,7 +2260,6 @@ body.wishlist-page {
 }
 
 .contact-modal-title {
-  font-family: "Inter", sans-serif;
   font-size: 19px;
   font-weight: 500;
   color: var(--text);
@@ -2281,7 +2268,6 @@ body.wishlist-page {
 }
 
 .contact-modal-text {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-light);
@@ -2313,7 +2299,6 @@ body.wishlist-page {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 16px;
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   cursor: pointer;
@@ -2738,24 +2723,35 @@ body.wishlist-page {
 .homepage-light-glow {
   position: fixed;
   top: 0;
-  bottom:5%;
+  bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
   width: 38%;
   max-width: 430px;
-  height: 180px;
-  background: radial-gradient(ellipse at center top, rgba(108, 161, 245, 0.5) 0%, rgba(142, 188, 243, 0.3) 50%, rgba(147, 197, 253, 0.15) 100%);
-  opacity: 0.3;
-  filter: blur(10px);
-  box-shadow: 
-    0 0 12px rgba(96, 165, 250, 0.25),
-    0 0 24px rgba(59, 130, 246, 0.2),
-    0 0 36px rgba(96, 165, 250, 0.15),
-    0 0 48px rgba(59, 130, 246, 0.1);
+  height: 160px;
+
+  /* Softer, more diffused blue gradient */
+background: radial-gradient(
+  ellipse at center top,
+  rgba(36, 88, 151, 0.25) 0%,
+  rgba(85, 140, 205, 0.25) 50%,
+  rgba(170, 170, 170, 0.1) 100%  
+);
+
+
+  opacity: 0.55;
+  filter: blur(2px);
+
+  box-shadow:
+    0 0 20px rgba(147, 197, 253, 0.15),
+    0 0 40px rgba(147, 197, 253, 0.1),
+    0 0 80px rgba(147, 197, 253, 0.05);
+
+  border-radius: 0 0 1000px 1000px;
   z-index: 101;
   pointer-events: none;
-  border-radius: 0 0 10000px 10000px;
 }
+
 
 @media (max-width: 430px) {
   .homepage-light-glow {
@@ -2768,16 +2764,15 @@ body.wishlist-page {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  background: #171717;
+  box-shadow: none;
 }
 
 .header-content {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 16px 20px;
+  gap: 12px;
+  padding: 8px 16px 10px 16px;
   max-width: 100%;
   min-width: 0;
 }
@@ -2805,24 +2800,23 @@ body.wishlist-page {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .delivery-text {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text);
   margin: 0;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
   line-height: 1.4;
   letter-spacing: -0.3px;
+  white-space: nowrap;
 }
 
 .delivery-text .highlight {
   color: #3b82f6;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .address-wrapper {
@@ -2838,18 +2832,16 @@ body.wishlist-page {
 }
 
 .address {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: "Poppins", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .address-wrapper svg {
-  color: var(--text-light);
+  color: #fff;
   flex-shrink: 0;
 }
 
@@ -3063,7 +3055,6 @@ body.otp-page {
   border-radius: 12px;
   font-size: 16px;
   color: var(--text);
-  font-family: "Inter", sans-serif;
   transition: all 0.3s;
   outline: none;
 }
@@ -3079,7 +3070,7 @@ body.otp-page {
 
 /* Cart Page V2 */
 .cart-page-v2 {
-  background: var(--bg-section);
+  background: #171717;
   min-height: 100vh;
   padding-bottom: 90px;
 }
@@ -3088,17 +3079,18 @@ body.otp-page {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--card-bg);
-  padding: 16px 20px;
+  background: #171717;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid #292929;
 }
 
 .cart-title-v2 {
-  font-size: 24px;
-  font-weight: 500;
+  font-size: 27px;
+  font-weight: 600;
   color: var(--text);
   margin: 0;
   letter-spacing: 0.3px;
@@ -3159,7 +3151,7 @@ body.otp-page {
 
 .start-shopping-btn-v2 {
   padding: 14px 32px;
-  background: #8b5cf6;
+  background: #6678ff;
   color: white;
   border: none;
   border-radius: 12px;
@@ -3172,7 +3164,7 @@ body.otp-page {
 }
 
 .start-shopping-btn-v2:hover {
-  background: #7c3aed;
+  background: #6678ff;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
@@ -3618,7 +3610,6 @@ body.otp-page {
 }
 
 .checkout-title-v2 {
-  font-family: "Inter", sans-serif;
   font-size: 24px;
   font-weight: 500;
   color: var(--text);
@@ -3635,7 +3626,6 @@ body.otp-page {
   padding: 6px;
   border-radius: 8px;
   color: var(--text-light);
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -3702,7 +3692,6 @@ body.otp-page {
 }
 
 .checkout-item-name {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
@@ -3766,7 +3755,6 @@ body.otp-page {
 }
 
 .checkout-item-quantity span {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
@@ -3775,7 +3763,6 @@ body.otp-page {
 }
 
 .checkout-item-price-current {
-  font-family: "Inter", sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--text);
@@ -3789,7 +3776,6 @@ body.otp-page {
 }
 
 .checkout-coupon-title {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
@@ -3807,7 +3793,6 @@ body.otp-page {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   color: var(--text);
   background: var(--bg-section);
@@ -3830,7 +3815,6 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 10px;
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -3864,7 +3848,6 @@ body.otp-page {
   align-items: center;
   gap: 8px;
   color: #16a34a;
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
 }
@@ -3878,7 +3861,6 @@ body.otp-page {
   border: none;
   padding: 6px 12px;
   color: #dc2626;
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -3891,14 +3873,12 @@ body.otp-page {
 }
 
 .checkout-coupon-error {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   color: #dc2626;
   margin: 8px 0 0 0;
 }
 
 .checkout-coupon-success {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   color: #059669;
   margin: 8px 0 0 0;
@@ -3910,7 +3890,6 @@ body.otp-page {
 }
 
 .checkout-coupon-hints p {
-  font-family: "Inter", sans-serif;
   font-size: 12px;
   color: var(--text-light);
   margin: 0;
@@ -3930,7 +3909,6 @@ body.otp-page {
 }
 
 .checkout-summary-title {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
@@ -3942,7 +3920,6 @@ body.otp-page {
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   color: var(--text-light);
 }
@@ -4008,7 +3985,6 @@ body.otp-page {
 }
 
 .checkout-section-title-v2 {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
@@ -4021,7 +3997,6 @@ body.otp-page {
   padding: 6px 14px;
   border-radius: 8px;
   color: #3b82f6;
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -4053,7 +4028,6 @@ body.otp-page {
 }
 
 .checkout-address-name {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
@@ -4061,7 +4035,6 @@ body.otp-page {
 }
 
 .checkout-address-text {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text-light);
@@ -4070,7 +4043,6 @@ body.otp-page {
 }
 
 .checkout-address-phone {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: var(--text);
@@ -4083,8 +4055,6 @@ body.otp-page {
   border: 2px dashed #d1d5db;
   border-radius: 10px;
   color: var(--text-light);
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
@@ -4752,7 +4722,6 @@ body.otp-page {
   border-radius: 12px;
   font-size: 15px;
   color: var(--text);
-  font-family: "Inter", sans-serif;
   transition: all 0.3s;
   outline: none;
   background: var(--card-bg);
@@ -5338,7 +5307,6 @@ body.otp-page {
 }
 
 .orders-title {
-  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 500;
   color: var(--text);
@@ -5364,7 +5332,6 @@ body.otp-page {
 }
 
 .orders-empty-title {
-  font-family: "Inter", sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: #333333;
@@ -5372,7 +5339,6 @@ body.otp-page {
 }
 
 .orders-empty-text {
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: #666666;
@@ -5387,7 +5353,6 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 24px;
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   cursor: pointer;
@@ -5428,14 +5393,12 @@ body.otp-page {
 }
 
 .order-id {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
 }
 
 .order-status {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   text-transform: capitalize;
@@ -5470,7 +5433,6 @@ body.otp-page {
 }
 
 .order-item-name {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
@@ -5478,7 +5440,6 @@ body.otp-page {
 }
 
 .order-item-qty {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text-light);
@@ -5486,7 +5447,6 @@ body.otp-page {
 }
 
 .order-more-items {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: #3b82f6;
@@ -5503,7 +5463,6 @@ body.otp-page {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text-light);
@@ -5515,7 +5474,6 @@ body.otp-page {
 }
 
 .order-total {
-  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
@@ -5541,7 +5499,6 @@ body.otp-page {
 }
 
 .refer-title-v2 {
-  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 500;
   color: var(--text);
@@ -5600,7 +5557,6 @@ body.otp-page {
 }
 
 .refer-banner-title {
-  font-family: "Inter", sans-serif;
   font-size: 26px;
   font-weight: 600;
   color: white;
@@ -5617,7 +5573,6 @@ body.otp-page {
 }
 
 .refer-banner-subtitle {
-  font-family: "Inter", sans-serif;
   font-size: 11px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
@@ -5645,7 +5600,6 @@ body.otp-page {
   align-items: center;
   gap: 8px;
   color: white;
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 1px;
@@ -5664,7 +5618,6 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 18px;
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -5686,7 +5639,6 @@ body.otp-page {
 }
 
 .refer-section-title {
-  font-family: "Inter", sans-serif;
   font-size: 17px;
   font-weight: 500;
   color: var(--text);
@@ -5753,7 +5705,6 @@ body.otp-page {
 }
 
 .refer-step-text p {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-light);
@@ -5783,7 +5734,6 @@ body.otp-page {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: var(--text-light);
@@ -5794,7 +5744,6 @@ body.otp-page {
 }
 
 .refer-summary-value {
-  font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #10b981;
@@ -5809,7 +5758,6 @@ body.otp-page {
 }
 
 .refer-referrals-empty {
-  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text-light);
@@ -5828,7 +5776,6 @@ body.otp-page {
 }
 
 .refer-code-label {
-  font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-light);
@@ -5841,7 +5788,6 @@ body.otp-page {
 }
 
 .refer-code-value {
-  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #3b82f6;
@@ -5870,7 +5816,6 @@ body.otp-page {
   color: white;
   border: none;
   border-radius: 22px;
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -5896,7 +5841,7 @@ body.otp-page {
 .addresses-page-container {
   width: 100%;
   max-width: 480px;
-  background: var(--bg-section);
+  background: #171717;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -5904,19 +5849,20 @@ body.otp-page {
 }
 
 .addresses-header {
-  background: var(--card-bg);
-  padding: 16px 20px;
+  background: #171717;
+   border-bottom: 1px solid #2c2c2c;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  text-align: left;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
   z-index: 10;
 }
 
 .addresses-title {
-  font-size: 24px;
-  font-weight: 500;
+  font-size: 27px;
+  font-weight: 600;
   color: var(--text);
   margin: 0;
   letter-spacing: 0.3px;
@@ -5934,7 +5880,7 @@ body.otp-page {
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background: var(--card-bg);
+  background: #272727;
   color: #4b5563;
   border: none;
   border-radius: 16px;
@@ -5968,6 +5914,10 @@ body.otp-page {
   justify-content: center;
 }
 
+.addresses-add-btn-left span {
+  color: white;
+}
+
 .addresses-add-btn svg:last-child {
   color: #d1d5db;
 }
@@ -5994,9 +5944,9 @@ body.otp-page {
 }
 
 .saved-addresses-heading {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-light);
+  font-size: 21px;
+  font-weight: 600;
+  color: #ffffff;
   margin: 0 0 16px 0;
   letter-spacing: 0.3px;
 }
@@ -6008,7 +5958,7 @@ body.otp-page {
 }
 
 .address-card {
-  background: var(--card-bg);
+  background: #272727;
   padding: 14px 16px;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -6020,9 +5970,9 @@ body.otp-page {
 }
 
 .address-card-delivery {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
-  color: #8b5cf6;
+  color: #ffffff;
   margin-bottom: 10px;
   letter-spacing: 0.2px;
 }
@@ -6122,7 +6072,7 @@ body.otp-page {
 }
 
 .account-header-v2 {
-  background: var(--bg-section);
+  background: #171717;
   padding: 20px 24px;
   display: flex;
   align-items: center;
@@ -6133,7 +6083,7 @@ body.otp-page {
 }
 
 .account-title-v2 {
-  font-size: 24px;
+  font-size: 27px;
   font-weight: 500;
   color: var(--text);
   margin: 0;
@@ -6146,6 +6096,7 @@ body.otp-page {
   flex: 1;
   display: flex;
   flex-direction: column;
+    background: #171717;
 }
 
 .account-avatar-section {
@@ -6177,8 +6128,7 @@ body.otp-page {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #e5e7eb;
-  border: 3px solid white;
+  background: #4a4a4a;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6772,7 +6722,6 @@ body.otp-page {
 
 .date-picker-title {
   text-align: center;
-  font-family: "Inter", sans-serif;
   color: var(--text);
   font-size: 17px;
   font-weight: 500;
@@ -6878,7 +6827,6 @@ body.otp-page {
   align-items: center;
   justify-content: center;
   padding: 0 8px;
-  font-family: "Inter", sans-serif;
   font-size: 17px;
   color: var(--text-light);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -6911,7 +6859,6 @@ body.otp-page {
   background: #3b82f6;
   color: #ffffff;
   border: none;
-  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.2px;
@@ -7025,7 +6972,7 @@ body.otp-page {
 }
 
 .location-modal {
-  background: var(--bg-section);
+  background: #171717;
   width: 100%;
   max-width: 430px;
   margin: 0 auto;

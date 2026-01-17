@@ -351,22 +351,11 @@ export default function WishlistPage() {
           {filteredItems.length === 0 ? (
             <div className="empty-wishlist">
               <div className="empty-state-icon">
-                <svg
-                  width="64"
-                  height="64"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  viewBox="0 0 24 24"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
+             <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="#96a2ff" viewBox="0 0 256 256"><path d="M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z"></path></svg>
               </div>
               <h2 className="empty-state-title">Fill your wishlist?</h2>
               <p className="empty-state-text">
-                Save your favorite plants and flowers to buy them later
+                Save items you love and find them here anytime.
               </p>
               <button
                 className="start-shopping-btn"

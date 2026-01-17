@@ -63,11 +63,11 @@ const BottomNavbar: React.FC = () => {
         width: '100%',
         maxWidth: '430px',
         zIndex: 100,
-        background: 'linear-gradient(0deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 45, 45, 0.98) 100%)',
+        background: '#171717',
         backdropFilter: 'blur(10px)',
         boxShadow: '0 -2px 10px rgba(0,0,0,0.3)',
-        borderTop: '1px solid #404040',
-        padding: '12px 0 calc(12px + env(safe-area-inset-bottom))',
+       
+        padding: '4px 0 calc(4px + env(safe-area-inset-bottom))',
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -85,11 +85,11 @@ const BottomNavbar: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '8px 20px',
-                color: isActive('/') ? '#3b82f6' : '#b0b0b0',
+                padding: '4px 20px',
+                color: isActive('/') ? 'rgb(102, 120, 255)' : '#b0b0b0',
                 transition: 'color 0.2s',
                 fontSize: '12px',
-                fontWeight: '500',
+                fontWeight: '600',
                 textDecoration: 'none',
                 background: 'none',
                 border: 'none',
@@ -111,11 +111,11 @@ const BottomNavbar: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '8px 20px',
-                color: isActive('/') ? '#3b82f6' : '#b0b0b0',
+                padding: '4px 20px',
+                color: isActive('/') ? 'rgb(102, 120, 255)' : '#b0b0b0',
                 transition: 'color 0.2s',
-                fontSize: '12px',
-                fontWeight: '500',
+                fontSize: '14px',
+                fontWeight: '600',
                 textDecoration: 'none'
               }}
             >
@@ -134,20 +134,15 @@ const BottomNavbar: React.FC = () => {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '4px',
-              padding: '8px 20px',
-                color: isActive('/categories') ? '#3b82f6' : '#b0b0b0',
+              padding: '4px 20px',
+                color: isActive('/categories') ? 'rgb(102, 120, 255)' : '#b0b0b0',
               transition: 'color 0.2s',
               fontSize: '12px',
               fontWeight: '500',
               textDecoration: 'none'
             }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <rect x="4" y="4" width="7" height="7" stroke="currentColor" strokeWidth="1.5"/>
-              <rect x="13" y="4" width="7" height="7" stroke="currentColor" strokeWidth="1.5"/>
-              <rect x="4" y="13" width="7" height="7" stroke="currentColor" strokeWidth="1.5"/>
-              <rect x="13" y="13" width="7" height="7" stroke="currentColor" strokeWidth="1.5"/>
-            </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#e9e8e8" viewBox="0 0 256 256"><path d="M120,56v48a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V56A16,16,0,0,1,56,40h48A16,16,0,0,1,120,56Zm80-16H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm-96,96H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm96,0H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Z"></path></svg>
             <span>Categories</span>
           </Link>
           
@@ -159,8 +154,8 @@ const BottomNavbar: React.FC = () => {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '4px',
-              padding: '8px 20px',
-                color: isActive('/trends') ? '#3b82f6' : '#b0b0b0',
+              padding: '4px 20px',
+                color: isActive('/trends') ? 'rgb(102, 120, 255)' : '#b0b0b0',
               transition: 'color 0.2s',
               fontSize: '12px',
               fontWeight: '500',
@@ -183,8 +178,8 @@ const BottomNavbar: React.FC = () => {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '4px',
-              padding: '8px 20px',
-                color: isActive('/cart') ? '#3b82f6' : '#b0b0b0',
+              padding: '4px 20px',
+                color: isActive('/cart') ? 'rgb(102, 120, 255)' : '#b0b0b0',
               transition: 'color 0.2s',
               fontSize: '12px',
               fontWeight: '500',
@@ -201,11 +196,11 @@ const BottomNavbar: React.FC = () => {
                 padding: '6px'
               }}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M3 6H21" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="currentColor" strokeWidth="1.5"/>
-              </svg>
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+</svg>
+
+
               {cartCount > 0 && (
                 <span 
                   style={{
