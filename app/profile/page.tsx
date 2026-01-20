@@ -101,7 +101,7 @@ export default function ProfilePage() {
             <div className="profile-login-prompt" onClick={handleLoginClick}>
               <h2 className="profile-login-title">Tap here to Sign up/Login</h2>
               <p className="profile-login-subtitle">
-                Login for a personalized experience, exclusive discounts, Inkhub cash rebates and more!
+                Login for a personalized experience, exclusive discounts, INKHUB cash rebates and more!
               </p>
             </div>
             
