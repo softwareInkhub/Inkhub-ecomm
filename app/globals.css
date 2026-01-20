@@ -2715,7 +2715,7 @@ body.wishlist-page {
   bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
-  width:100%;
+  width: 100%;
   max-width: 430px;
   height: 160px;
 
@@ -3024,7 +3024,6 @@ body.otp-page {
 }
 
 .verify-btn:not(:disabled):hover {
-  background: #2563eb;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -5343,14 +5342,14 @@ body.otp-page {
 
 .orders-shop-btn {
   color: #fff;
-    cursor: pointer;
-    background: #6678ff;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 32px;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all .2s;
+  cursor: pointer;
+  background: #6678ff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all .2s;
 }
 
 .orders-shop-btn:hover {
@@ -5660,7 +5659,7 @@ body.otp-page {
 .refer-step-icon {
   width: 48px;
   height: 48px;
-  border-radius:50%;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -13,6 +13,13 @@ export default function OTPPage() {
   const [isVerifying, setIsVerifying] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [isResending, setIsResending] = useState(false)
+  const [resendCountdown, setResendCountdown] = useState(60)
+  const [resendDisabled, setResendDisabled] = useState(true)
+  const [resendCount, setResendCount] = useState(0)
+
+  // Keys for localStorage
+  const RESEND_COUNT_KEY = 'bagichaOtpResendCount'
+  const RESEND_DATE_KEY = 'bagichaOtpResendDate'
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -25,7 +32,41 @@ export default function OTPPage() {
   useEffect(() => {
     const phone = localStorage.getItem('bagichaPhoneNumber')
     setPhoneNumber(phone || '9876543210')
+
+    // Initialize resend count with per-day reset
+    const today = new Date().toISOString().slice(0, 10)
+    const storedDate = localStorage.getItem(RESEND_DATE_KEY)
+    const storedCount = localStorage.getItem(RESEND_COUNT_KEY)
+
+    if (storedDate === today && storedCount) {
+      setResendCount(parseInt(storedCount, 10) || 0)
+    } else {
+      localStorage.setItem(RESEND_DATE_KEY, today)
+      localStorage.setItem(RESEND_COUNT_KEY, '0')
+      setResendCount(0)
+    }
   }, [])
+
+  // Countdown effect for resend
+  useEffect(() => {
+    if (!resendDisabled) return
+    if (resendCountdown <= 0) {
+      setResendDisabled(false)
+      return
+    }
+
+    const timer = setInterval(() => {
+      setResendCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [resendDisabled, resendCountdown])
 
   const handleChange = (index: number, value: string) => {
     if (value && !/^\d$/.test(value)) return
@@ -274,26 +315,51 @@ export default function OTPPage() {
             </p>
           )}
           <p className="resend-text">
-            Didn't receive the code? <a href="#" className="resend-link" onClick={async (e) => {
-              e.preventDefault()
-              if (isResending) return
-              setIsResending(true)
-              setErrorMessage('')
-              try {
-                const result = await resendOTP(phoneNumber)
-                if (result.success) {
-                  alert('OTP resent successfully')
-                } else {
-                  setErrorMessage(result.error || 'Failed to resend OTP. Please try again.')
+            Didn't receive the code?{' '}
+            <a
+              href="#"
+              className="resend-link"
+              onClick={async (e) => {
+                e.preventDefault()
+                if (isResending || resendDisabled) return
+
+                // Enforce max 5 resends per day per user
+                if (resendCount >= 5) {
+                  setErrorMessage('You have reached the maximum OTP resend limit for today. Please try again tomorrow.')
+                  return
                 }
-              } catch (error: any) {
-                console.error('Error resending OTP:', error)
-                setErrorMessage('Failed to resend OTP. Please try again.')
-              } finally {
-                setIsResending(false)
-              }
-            }}>
-              {isResending ? 'Resending...' : 'Resend'}
+
+                setIsResending(true)
+                setErrorMessage('')
+                try {
+                  const result = await resendOTP(phoneNumber)
+                  if (result.success) {
+                    // Update resend count and persist
+                    const newCount = resendCount + 1
+                    setResendCount(newCount)
+                    localStorage.setItem(RESEND_COUNT_KEY, String(newCount))
+
+                    // Restart 60s countdown
+                    setResendCountdown(60)
+                    setResendDisabled(true)
+                    alert('OTP resent successfully')
+                  } else {
+                    setErrorMessage(result.error || 'Failed to resend OTP. Please try again.')
+                  }
+                } catch (error: any) {
+                  console.error('Error resending OTP:', error)
+                  setErrorMessage('Failed to resend OTP. Please try again.')
+                } finally {
+                  setIsResending(false)
+                }
+              }}
+              style={{ pointerEvents: isResending || resendDisabled ? 'none' : 'auto', opacity: isResending || resendDisabled ? 0.5 : 1 }}
+            >
+              {isResending
+                ? 'Resending...'
+                : resendDisabled
+                ? `Resend in ${resendCountdown}s`
+                : 'Resend'}
             </a>
           </p>
           
