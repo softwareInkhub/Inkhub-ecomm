@@ -47,7 +47,7 @@ export default function TrendsPage() {
       <div className="trends-header">
         <h1 className="trends-main-title">
           <span className="trends-title-text">Trending</span>
-          <span className="trends-title-highlight"> Plants</span>
+          <span className="trends-title-highlight"> Tattoos</span>
         </h1>
         <p className="trends-subtitle">
           Stay ahead of the ink curve with curated designs. Your guide to what's hot now!
@@ -57,12 +57,12 @@ export default function TrendsPage() {
       <main className="trends-content">
         <div data-section-id="trending">
         <TrendingBanner
-          title="Flowers"
+          title="ANIME & POP TATTOOS"
           subtitle="EXPRESS YOUR FANDOM"
           tagline="ICONIC DESIGNS"
           image={categoryImages.anime || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="600" height="600"%3E%3Crect fill="%23f0f0f0" width="600" height="600"/%3E%3C/svg%3E'}
           buttonText="SHOP NOW"
-          bgColor="linear-gradient(135deg, #00ab6b 0%, #008f5a 100%)"
+          bgColor="linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)"
           onClick={() => handleBannerClick('Anime & Pop Tattoos')}
         />
 
@@ -75,7 +75,7 @@ export default function TrendsPage() {
 
         <div data-section-id="best-sellers">
         <TrendingBanner
-          title="Roses"
+          title="MINIMAL TATTOOS"
           subtitle="LESS IS MORE"
           tagline="ELEGANT SIMPLICITY"
           image={categoryImages.minimal || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="600" height="600"%3E%3Crect fill="%23f0f0f0" width="600" height="600"/%3E%3C/svg%3E'}

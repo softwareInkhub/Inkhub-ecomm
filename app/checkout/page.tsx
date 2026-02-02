@@ -25,7 +25,7 @@ export default function CheckoutPage() {
     window.scrollTo(0, 0)
     
     // Check authentication
-    const isAuthenticated = localStorage.getItem('Bagichaauthenticated') === 'true'
+    const isAuthenticated = localStorage.getItem('Inkhubuthenticated') === 'true'
     if (!isAuthenticated) {
       router.push('/profile')
       return
@@ -46,7 +46,7 @@ export default function CheckoutPage() {
     setQuantities(initialQuantities)
     
     // Check if there's a saved address
-    const savedAddress = JSON.parse(localStorage.getItem('Bagichaaddress') || '{}')
+    const savedAddress = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
     if (Object.keys(savedAddress).length > 0) {
       setSelectedAddress(savedAddress)
     } else {
@@ -208,7 +208,7 @@ export default function CheckoutPage() {
 
   const handleSelectAddress = (address: Address) => {
     setSelectedAddress(address)
-    localStorage.setItem('Bagichaaddress', JSON.stringify(address))
+    localStorage.setItem('Inkhubddress', JSON.stringify(address))
     
     // Also add to saved addresses if not already there
     const savedAddresses = JSON.parse(localStorage.getItem('bagichaSavedAddresses') || '[]')

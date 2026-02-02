@@ -8,7 +8,7 @@
  */
 export function clearAllAuthData(): void {
   // Authentication tokens - both snake_case and camelCase versions
-  localStorage.removeItem('Bagichaauthenticated')
+  localStorage.removeItem('Inkhubuthenticated')
   localStorage.removeItem('access_token')
   localStorage.removeItem('accessToken')
   localStorage.removeItem('idToken')
@@ -28,7 +28,7 @@ export function clearAllAuthData(): void {
   localStorage.removeItem('verification_email')
 
   // Address data
-  localStorage.removeItem('Bagichaaddress')
+  localStorage.removeItem('Inkhubddress')
   localStorage.removeItem('bagichaSavedAddresses')
 
   // Cart and orders
@@ -59,7 +59,7 @@ export function clearAllAuthData(): void {
   localStorage.removeItem('ally-supports-cache')
 
   // Avatar
-  localStorage.removeItem('Bagichaavatar')
+  localStorage.removeItem('Inkhubvatar')
 
   // Scheduled delivery
   localStorage.removeItem('scheduledDelivery')

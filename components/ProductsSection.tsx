@@ -312,7 +312,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   const handleHeartClick = useCallback((productId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const isAuthenticated =
-      localStorage.getItem("Bagichaauthenticated") === "true";
+      localStorage.getItem("Inkhubuthenticated") === "true";
     if (!isAuthenticated && onWishlistClick) {
       onWishlistClick();
       return;

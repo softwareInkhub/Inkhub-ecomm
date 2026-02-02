@@ -41,14 +41,14 @@ export default function PaymentPage() {
     
     // Check authentication
     if (typeof window === 'undefined') return
-    const isAuthenticated = localStorage.getItem('Bagichaauthenticated') === 'true'
+    const isAuthenticated = localStorage.getItem('Inkhubuthenticated') === 'true'
     if (!isAuthenticated) {
       router.push('/profile')
       return
     }
 
     const items = JSON.parse(localStorage.getItem('bagichaCart') || '[]')
-    const address = JSON.parse(localStorage.getItem('Bagichaaddress') || '{}')
+    const address = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
     
     if (items.length === 0) {
       router.push('/cart')
@@ -183,7 +183,7 @@ export default function PaymentPage() {
       // Get scheduled delivery info
       const scheduledDelivery = localStorage.getItem('scheduledDelivery')
       const appliedCouponData = getAppliedCoupon()
-      const address = JSON.parse(localStorage.getItem('Bagichaaddress') || '{}')
+      const address = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
       const customerDetails = getCustomerDetails()
       
       // Calculate totals fresh (ensures consistency with Razorpay)

@@ -11,11 +11,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bagicha",
+  title: "Inkhub - Premium Temporary Tattoos",
   description: "Shop unique and high-quality temporary tattoos. Express yourself with our exclusive collection of spiritual, anime, minimal, and bold designs.",
   keywords: "temporary tattoos, tattoo shop, spiritual tattoos, anime tattoos, minimal tattoos, body art",
   openGraph: {
-    title: "Bagicha",
+    title: "Inkhub - Premium Temporary Tattoos",
     description: "Shop unique and high-quality temporary tattoos",
     type: "website",
   },

@@ -20,7 +20,7 @@ const FixedHeader: React.FC<FixedHeaderProps> = ({
   useEffect(() => {
     const checkAuth = () => {
       const authenticated =
-        localStorage.getItem("Bagichaauthenticated") === "true";
+        localStorage.getItem("Inkhubuthenticated") === "true";
       setIsAuthenticated(authenticated);
     };
 

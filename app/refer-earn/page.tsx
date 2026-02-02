@@ -16,13 +16,13 @@ export default function ReferEarnPage() {
   }
 
   const handleShareLink = () => {
-    const message = `Join Bagicha and get amazing tattoos! Use my referral code ${referralCode} to get ₹250 off on your first order`
+    const message = `Join Inkhub and get amazing tattoos! Use my referral code ${referralCode} to get ₹250 off on your first order. Download now: https://Inkhub.app`
     
     if (navigator.share) {
       navigator.share({
-        title: 'Bagicha Referral',
+        title: 'Inkhub Referral',
         text: message,
-        url: 'https://bagicha.in'
+        url: 'https://Inkhub.app'
       }).catch(() => {
         // Fallback to WhatsApp if share fails
         window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank')

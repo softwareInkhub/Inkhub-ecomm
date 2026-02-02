@@ -447,7 +447,7 @@ class ShopifyService {
     // Hardcoded fallback coupons for testing
     const fallbackCoupons: Record<string, { type: 'fixed_amount' | 'percentage', value: number, title: string }> = {
       'FREE100': { type: 'fixed_amount', value: cartTotal, title: 'Free Order' },
-      'Bagicha100': { type: 'fixed_amount', value: 100, title: '₹100 Off' },
+      'Inkhub100': { type: 'fixed_amount', value: 100, title: '₹100 Off' },
       'SAVE50': { type: 'fixed_amount', value: 50, title: '₹50 Off' },
       'WELCOME10': { type: 'percentage', value: 10, title: '10% Off' },
       'SAVE20': { type: 'percentage', value: 20, title: '20% Off' },

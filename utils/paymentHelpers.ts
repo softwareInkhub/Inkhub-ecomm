@@ -32,7 +32,7 @@ export const getCustomerDetails = () => {
   
   return {
     name: userName,
-    email: userEmail || `${userPhone}@bagicha.com`, // Fallback email
+    email: userEmail || `${userPhone}@Inkhub.com`, // Fallback email
     phone: userPhone,
   }
 }
@@ -41,7 +41,7 @@ export const getCustomerDetails = () => {
  * Get shipping address from localStorage
  */
 export const getShippingAddress = () => {
-  const address = JSON.parse(localStorage.getItem('Bagichaaddress') || '{}')
+  const address = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
   
   if (Object.keys(address).length === 0) {
     return null
@@ -84,7 +84,7 @@ export const calculateCouponDiscount = (): number => {
     }
   } catch (e) {
     // Handle old format (just string) - backward compatibility
-    if (appliedCoupon === 'Bagicha100') {
+    if (appliedCoupon === 'Inkhub100') {
       return 100
     }
   }

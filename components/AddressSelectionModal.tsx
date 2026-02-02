@@ -26,7 +26,7 @@ const AddressSelectionModal: React.FC<AddressSelectionModalProps> = ({
       setSavedAddresses(addresses)
       
       // Check if there's a currently selected address
-      const currentAddress = JSON.parse(localStorage.getItem('Bagichaaddress') || '{}')
+      const currentAddress = JSON.parse(localStorage.getItem('Inkhubddress') || '{}')
       if (currentAddress.id) {
         setSelectedAddressId(currentAddress.id)
       }

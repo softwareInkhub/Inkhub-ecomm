@@ -68,7 +68,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose }) => {
         <div className="location-options">
           <button className="location-option-btn" onClick={handleAddNewAddress}>
             <div className="location-option-left">
-              <svg width="24" height="24" fill="none" stroke="#00ab6b" strokeWidth="2" viewBox="0 0 24 24">
+              <svg width="24" height="24" fill="none" stroke="#3b82f6" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" y1="8" x2="12" y2="16"/>
                 <line x1="8" y1="12" x2="16" y2="12"/>
@@ -82,10 +82,10 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose }) => {
 
           <button className="location-option-btn" onClick={handleSetDeliveryLocation}>
             <div className="location-option-left">
-              <svg width="24" height="24" fill="none" stroke="#00ab6b" strokeWidth="2" viewBox="0 0 24 24">
+              <svg width="24" height="24" fill="none" stroke="#3b82f6" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                 <circle cx="12" cy="10" r="3"/>
-                <path d="M12 7v6M12 13h.01" stroke="#00ab6b" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M12 7v6M12 13h.01" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round"/>
               </svg>
               <span>Set delivery location</span>
             </div>

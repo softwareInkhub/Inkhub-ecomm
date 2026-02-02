@@ -22,7 +22,7 @@ export default function TermsConditionsPage() {
           <section className="terms-section">
             <h2>1. Introduction</h2>
             <p>
-              Welcome to Bagicha. By accessing and using our services, you agree to be bound by these 
+              Welcome to Inkhub. By accessing and using our services, you agree to be bound by these 
               Terms and Conditions. Please read them carefully before using our platform.
             </p>
           </section>
@@ -30,7 +30,7 @@ export default function TermsConditionsPage() {
           <section className="terms-section">
             <h2>2. Use of Service</h2>
             <p>
-              You must be at least 18 years old to use our services. By using Bagicha, you represent 
+              You must be at least 18 years old to use our services. By using Inkhub, you represent 
               that you meet this age requirement and have the legal capacity to enter into these Terms.
             </p>
           </section>
@@ -72,7 +72,7 @@ export default function TermsConditionsPage() {
           <section className="terms-section">
             <h2>7. Intellectual Property</h2>
             <p>
-              All content, trademarks, and intellectual property on Bagicha belong to us. You may not 
+              All content, trademarks, and intellectual property on Inkhub belong to us. You may not 
               use, copy, or distribute any content without our prior written permission.
             </p>
           </section>
@@ -80,7 +80,7 @@ export default function TermsConditionsPage() {
           <section className="terms-section">
             <h2>8. Limitation of Liability</h2>
             <p>
-            Bagicha shall not be liable for any indirect, incidental, or consequential damages arising 
+              Inkhub shall not be liable for any indirect, incidental, or consequential damages arising 
               from the use of our services. Our total liability shall not exceed the amount paid for the order.
             </p>
           </section>
@@ -96,7 +96,7 @@ export default function TermsConditionsPage() {
           <section className="terms-section">
             <h2>10. Contact Us</h2>
             <p>
-              If you have any questions about these Terms, please contact us at support@Bagicha.com or 
+              If you have any questions about these Terms, please contact us at support@Inkhub.com or 
               call +91 98765 43210.
             </p>
           </section>

@@ -21,7 +21,7 @@ export default function CartPage() {
     window.scrollTo(0, 0)
     
     // Check authentication status
-    const authStatus = localStorage.getItem('Bagichaauthenticated') === 'true'
+    const authStatus = localStorage.getItem('Inkhubuthenticated') === 'true'
     setIsAuthenticated(authStatus)
 
     const items = JSON.parse(localStorage.getItem('bagichaCart') || '[]')
@@ -59,7 +59,7 @@ export default function CartPage() {
     
     // Listen for authentication changes
     const handleAuthUpdate = () => {
-      const authStatus = localStorage.getItem('Bagichaauthenticated') === 'true'
+      const authStatus = localStorage.getItem('Inkhubuthenticated') === 'true'
       setIsAuthenticated(authStatus)
     }
     
@@ -219,7 +219,7 @@ export default function CartPage() {
                       <img src={item.image} alt={item.title || item.name} />
                     </div>
                     <div className="cart-item-details-v2">
-                      <h3 className="cart-item-brand-v2">Bagicha</h3>
+                      <h3 className="cart-item-brand-v2">Inkhub</h3>
                       <p className="cart-item-name-v2">{item.title || item.name}</p>
                       <p className="cart-item-weight">250 g</p>
                       <div className="cart-item-price-row">

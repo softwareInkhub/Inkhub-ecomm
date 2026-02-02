@@ -151,7 +151,7 @@ class GoKwikService {
         webhook_url: this.config.callbackUrls.webhook,
         metadata: {
           platform: 'web',
-          source: 'Bagicha-app',
+          source: 'Inkhub-app',
         },
       }
 

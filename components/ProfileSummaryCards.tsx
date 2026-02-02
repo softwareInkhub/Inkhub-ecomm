@@ -28,7 +28,7 @@ const ProfileSummaryCards: React.FC<ProfileSummaryCardsProps> = ({ orderCount, k
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
           </svg>
         </div>
-        <div className="profile-summary-text">Bagicha cash</div>
+        <div className="profile-summary-text">Inkhub cash</div>
         <div className="profile-summary-value">₹{knotCash}</div>
       </div>
     </div>
