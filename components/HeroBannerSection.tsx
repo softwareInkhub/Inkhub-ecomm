@@ -11,24 +11,24 @@ const HeroBannerSection: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [banners, setBanners] = useState<Banner[]>([
     {
-      image: '/images/nature_tattoos.webp',
-      alt: 'Nature Tattoos'
+      image: '/images/bagicha-hero1.png',
+      alt: 'Bagicha Poster 1'
     },
     {
-      image: '/images/finger_pack_tattoo_2.webp',
-      alt: 'Finger Pack Tattoos'
+      image: '/images/bagicha-hero2.png',
+      alt: 'Bagicha Poster 2'
     },
     {
-      image: '/images/arm_band_banner.webp',
-      alt: 'Arm Band Tattoos'
+      image: '/images/bagicha-hero3.jpg',
+      alt: 'Bagicha Poster 3'
     },
     {
-      image: '/images/quote_tattoos.webp',
-      alt: 'Quote Tattoos'
+      image: '/images/bagicha-hero4.png',
+      alt: 'Bagicha Poster 4'
     },
     {
-      image: '/images/samurai_tattoo_2.webp',
-      alt: 'Samurai Tattoos'
+      image: '/images/bagicha-hero5.jpg',
+      alt: 'Bagicha Poster 5'
     }
   ])
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -54,7 +54,7 @@ const HeroBannerSection: React.FC = () => {
         // Keep default banners on error
       }
     }
-    
+
     loadBanners()
   }, [])
 
@@ -90,7 +90,7 @@ const HeroBannerSection: React.FC = () => {
       const containerWidth = scrollRef.current.offsetWidth
       const initialIndex = banners.length // Start at first banner of second set
       const initialScrollPosition = (initialIndex * itemWidth) - (containerWidth / 2) + (cardWidth / 2)
-      
+
       scrollRef.current.scrollTo({
         left: initialScrollPosition,
         behavior: 'auto'
@@ -114,10 +114,10 @@ const HeroBannerSection: React.FC = () => {
       const itemWidth = cardWidth + gap
       const totalOriginalBanners = banners.length
       const containerWidth = scrollRef.current.offsetWidth
-      
+
       // Calculate scroll position to center the active banner
       const scrollPosition = (currentIndex * itemWidth) - (containerWidth / 2) + (cardWidth / 2)
-      
+
       // Reset to beginning when reaching the end of second set
       if (currentIndex >= totalOriginalBanners * 2) {
         isScrollingRef.current = true
@@ -142,10 +142,10 @@ const HeroBannerSection: React.FC = () => {
   return (
     <section className="mb-4 -mt-0.5" aria-label="Hero Banners">
       {/* hero-banner-container from CSS: display: flex; gap: 2px; padding: 20px; scroll-snap-type: x mandatory; overflow-x: auto; */}
-      <div 
+      <div
         ref={scrollRef}
         className="scrollbar-hide"
-        style={{ 
+        style={{
           display: 'flex',
           gap: '2px',
           padding: '20px 0',
@@ -157,8 +157,8 @@ const HeroBannerSection: React.FC = () => {
         }}
       >
         {duplicatedBanners.map((banner, idx) => (
-          <div 
-            key={`banner-${idx}-${banner.image}`} 
+          <div
+            key={`banner-${idx}-${banner.image}`}
             className={`
               relative 
               ${idx === currentIndex ? 'active' : ''}
@@ -173,7 +173,7 @@ const HeroBannerSection: React.FC = () => {
               scrollSnapAlign: 'center',
               transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               position: 'relative',
-              boxShadow: idx === currentIndex 
+              boxShadow: idx === currentIndex
                 ? '0 20px 48px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.3)'
                 : '0 8px 24px rgba(0, 0, 0, 0.2)',
               opacity: idx === currentIndex ? 1 : 0.6,
@@ -183,13 +183,13 @@ const HeroBannerSection: React.FC = () => {
               flexDirection: 'column'
             }}
           >
-            <img 
-              src={banner.image} 
-              alt={banner.alt} 
-              style={{ 
-                width: '100%', 
-                height: '100%', 
-                objectFit: 'cover', 
+            <img
+              src={banner.image}
+              alt={banner.alt}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
                 display: 'block'
               }}
             />

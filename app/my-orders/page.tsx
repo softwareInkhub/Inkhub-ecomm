@@ -17,7 +17,7 @@ export default function MyOrdersPage() {
 
   useEffect(() => {
     // Check authentication
-    const isAuthenticated = localStorage.getItem('Inkhubuthenticated') === 'true'
+    const isAuthenticated = localStorage.getItem('Bagichaauthenticated') === 'true'
     if (!isAuthenticated) {
       router.push('/profile')
       return
@@ -32,7 +32,7 @@ export default function MyOrdersPage() {
     const colors: Record<string, string> = {
       'confirmed': '#10b981',
       'processing': '#f59e0b',
-      'shipped': '#3b82f6',
+      'shipped': '#00ab6b',
       'delivered': '#22c55e',
       'cancelled': '#ef4444'
     }
@@ -74,17 +74,17 @@ export default function MyOrdersPage() {
                 {/* Right flap */}
                 <path d="M100 40 L90 25 L90 40 Z" fill="#333333" stroke="#333333" strokeWidth="1"/>
                 {/* Blue accent lines on front */}
-                <line x1="35" y1="70" x2="65" y2="70" stroke="#6A6AFE" strokeWidth="1.5" strokeLinecap="round"/>
-                <line x1="35" y1="80" x2="65" y2="80" stroke="#6A6AFE" strokeWidth="1.5" strokeLinecap="round"/>
+                <line x1="35" y1="70" x2="65" y2="70" stroke="#00ab6b" strokeWidth="1.5" strokeLinecap="round"/>
+                <line x1="35" y1="80" x2="65" y2="80" stroke="#00ab6b" strokeWidth="1.5" strokeLinecap="round"/>
                 {/* Side label rectangle */}
-                <rect x="75" y="65" width="18" height="18" stroke="#6A6AFE" strokeWidth="1" fill="none" rx="1"/>
-                <line x1="78" y1="70" x2="88" y2="70" stroke="#6A6AFE" strokeWidth="0.8"/>
-                <line x1="78" y1="74" x2="88" y2="74" stroke="#6A6AFE" strokeWidth="0.8"/>
-                <line x1="78" y1="78" x2="88" y2="78" stroke="#6A6AFE" strokeWidth="0.8"/>
+                <rect x="75" y="65" width="18" height="18" stroke="#00ab6b" strokeWidth="1" fill="none" rx="1"/>
+                <line x1="78" y1="70" x2="88" y2="70" stroke="#00ab6b" strokeWidth="0.8"/>
+                <line x1="78" y1="74" x2="88" y2="74" stroke="#00ab6b" strokeWidth="0.8"/>
+                <line x1="78" y1="78" x2="88" y2="78" stroke="#00ab6b" strokeWidth="0.8"/>
                 {/* Question marks */}
-                <text x="70" y="22" fill="#6A6AFE" fontSize="20" fontWeight="500">?</text>
-                <text x="80" y="18" fill="#6A6AFE" fontSize="20" fontWeight="500">?</text>
-                <text x="90" y="24" fill="#6A6AFE" fontSize="20" fontWeight="500">?</text>
+                <text x="70" y="22" fill="#00ab6b" fontSize="20" fontWeight="500">?</text>
+                <text x="80" y="18" fill="#00ab6b" fontSize="20" fontWeight="500">?</text>
+                <text x="90" y="24" fill="#00ab6b" fontSize="20" fontWeight="500">?</text>
               </svg>
             </div>
             <h2 className="orders-empty-title">You haven't placed any order yet!</h2>

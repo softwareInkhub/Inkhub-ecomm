@@ -251,7 +251,7 @@ export default function ProductPage() {
           </svg>
         </button>
         <div className="product-detail-logo" onClick={() => router.push("/")}>
-          Inkhub
+          Bagicha
         </div>
         <button
           className="icon-btn cart-icon-btn"

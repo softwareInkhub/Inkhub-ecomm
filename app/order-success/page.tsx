@@ -32,7 +32,7 @@ export default function OrderSuccessPage() {
     console.log('📄 Order Success Page Loaded')
     
     // Check authentication
-    const isAuthenticated = localStorage.getItem('Inkhubuthenticated') === 'true'
+    const isAuthenticated = localStorage.getItem('Bagichaauthenticated') === 'true'
     console.log('🔐 Is Authenticated:', isAuthenticated)
     
     if (!isAuthenticated) {
@@ -270,7 +270,7 @@ export default function OrderSuccessPage() {
               </svg>
               Call Support
             </a>
-            <a href="mailto:support@Inkhub.com" className="order-help-link">
+            <a href="mailto:support@bagicha.com" className="order-help-link">
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                 <polyline points="22,6 12,13 2,6"/>

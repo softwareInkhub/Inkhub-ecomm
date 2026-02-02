@@ -116,7 +116,7 @@ export default function AdminPreviewHighlighter() {
           const element = targetElement as HTMLElement
           
           // Apply highlight with glow effect
-          element.style.outline = '3px solid #60a5fa'
+          element.style.outline = '3px solid #00ab6b'
           element.style.outlineOffset = '4px'
           element.style.boxShadow = '0 0 0 4px rgba(96, 165, 250, 0.2), 0 0 20px rgba(96, 165, 250, 0.3)'
           element.style.transition = 'all 0.3s ease-in-out'

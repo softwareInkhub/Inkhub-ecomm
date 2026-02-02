@@ -103,7 +103,7 @@ export default function OTPPage() {
           const phone = firebaseUser.phoneNumber || `+91${phoneNumber}`
           
           // Save to localStorage
-          localStorage.setItem('Inkhubuthenticated', 'true')
+          localStorage.setItem('Bagichaauthenticated', 'true')
           localStorage.setItem('bagichaUserPhone', phoneNumber)
           localStorage.setItem('firebaseUID', uid)
           

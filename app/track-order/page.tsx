@@ -27,7 +27,7 @@ function TrackOrderContent() {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('Inkhubuthenticated') === 'true'
+    const isAuthenticated = localStorage.getItem('Bagichaauthenticated') === 'true'
     if (!isAuthenticated) {
       router.push('/profile')
       return
@@ -178,7 +178,7 @@ function TrackOrderContent() {
         {/* Help Button */}
         <button 
           onClick={() => router.push('/profile')}
-          className="w-full bg-blue-50 border border-blue-200 text-blue-700 py-3 rounded-lg text-sm font-semibold hover:bg-blue-100 transition-colors"
+          className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 py-3 rounded-lg text-sm font-semibold hover:bg-emerald-100 transition-colors"
         >
           Need Help? Contact Support
         </button>

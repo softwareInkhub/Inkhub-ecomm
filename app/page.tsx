@@ -140,7 +140,7 @@ export default function Home() {
 
   const handleWishlistClick = () => {
     const isAuthenticated =
-      localStorage.getItem("Inkhubuthenticated") === "true";
+      localStorage.getItem("Bagichaauthenticated") === "true";
     if (isAuthenticated) {
       router.push("/wishlist");
     } else {

@@ -15,7 +15,7 @@ export async function GET() {
 
   return NextResponse.json({
     status: 'ok',
-    message: 'Inkhub Next.js Server is running',
+    message: 'Bagicha Next.js Server is running',
     redis: {
       connected: redis_connected,
       error: redis_error,

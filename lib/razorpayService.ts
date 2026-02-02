@@ -218,7 +218,7 @@ class RazorpayService {
       key: this.keyId,
       amount: Math.round(round2(amount) * 100), // Amount in paise (rounded first)
       currency: 'INR',
-      name: 'Inkhub',
+      name: 'Bagicha',
       description: 'Tattoos Purchase',
       image: 'https://your-logo-url.com/logo.png', // Optional: Add your logo URL
       prefill: {

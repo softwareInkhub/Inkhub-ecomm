@@ -50,7 +50,7 @@ export default function ManageAccountPage() {
     const instagram = localStorage.getItem('bagichaInstagram') || ''
     const dob = localStorage.getItem('bagichaDOB') || ''
     const gender = localStorage.getItem('bagichaGender') || ''
-    const avatar = localStorage.getItem('Inkhubvatar') || ''
+    const avatar = localStorage.getItem('Bagichaavatar') || ''
     
     setUserData({ firstName, lastName, phone, instagram, dob, gender, avatar })
   }, [])
@@ -93,7 +93,7 @@ export default function ManageAccountPage() {
       reader.onloadend = () => {
         const avatarData = reader.result as string
         setUserData({ ...userData, avatar: avatarData })
-        localStorage.setItem('Inkhubvatar', avatarData)
+        localStorage.setItem('Bagichaavatar', avatarData)
         setShowAvatarModal(false)
       }
       reader.readAsDataURL(file)
@@ -102,7 +102,7 @@ export default function ManageAccountPage() {
 
   const handleAvatarDelete = () => {
     setUserData({ ...userData, avatar: '' })
-    localStorage.removeItem('Inkhubvatar')
+    localStorage.removeItem('Bagichaavatar')
     setShowAvatarModal(false)
   }
 
