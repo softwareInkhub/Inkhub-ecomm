@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp,getApps, getApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
 
 // TODO: Replace with your actual Firebase config
@@ -12,7 +12,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+console.log("Firebase app name:", app.name);
+
 export const auth = getAuth(app);
 export { RecaptchaVerifier, signInWithPhoneNumber };
 export type { ConfirmationResult };

@@ -13,6 +13,13 @@ export default function OTPPage() {
   const [isVerifying, setIsVerifying] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [isResending, setIsResending] = useState(false)
+  const [resendCountdown, setResendCountdown] = useState(60)
+  const [resendDisabled, setResendDisabled] = useState(true)
+  const [resendCount, setResendCount] = useState(0)
+
+  // Keys for localStorage
+  const RESEND_COUNT_KEY = 'bagichaOtpResendCount'
+  const RESEND_DATE_KEY = 'bagichaOtpResendDate'
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -25,7 +32,41 @@ export default function OTPPage() {
   useEffect(() => {
     const phone = localStorage.getItem('bagichaPhoneNumber')
     setPhoneNumber(phone || '9876543210')
+
+    // Initialize resend count with per-day reset
+    const today = new Date().toISOString().slice(0, 10)
+    const storedDate = localStorage.getItem(RESEND_DATE_KEY)
+    const storedCount = localStorage.getItem(RESEND_COUNT_KEY)
+
+    if (storedDate === today && storedCount) {
+      setResendCount(parseInt(storedCount, 10) || 0)
+    } else {
+      localStorage.setItem(RESEND_DATE_KEY, today)
+      localStorage.setItem(RESEND_COUNT_KEY, '0')
+      setResendCount(0)
+    }
   }, [])
+
+  // Countdown effect for resend
+  useEffect(() => {
+    if (!resendDisabled) return
+    if (resendCountdown <= 0) {
+      setResendDisabled(false)
+      return
+    }
+
+    const timer = setInterval(() => {
+      setResendCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [resendDisabled, resendCountdown])
 
   const handleChange = (index: number, value: string) => {
     if (value && !/^\d$/.test(value)) return
@@ -55,21 +96,71 @@ export default function OTPPage() {
         // Verify OTP using Firebase
         const result = await verifyOTP(otpString)
         
-        if (result.success) {
+        if (result.success && result.user) {
           // OTP verified successfully
+          const firebaseUser = result.user
+          const uid = firebaseUser.uid
+          const phone = firebaseUser.phoneNumber || `+91${phoneNumber}`
+          
+          // Save to localStorage
           localStorage.setItem('Inkhubuthenticated', 'true')
-          
-          // Save phone number for payment system
           localStorage.setItem('bagichaUserPhone', phoneNumber)
+          localStorage.setItem('firebaseUID', uid)
           
-          // Check if user already has a name saved
-          const savedName = localStorage.getItem('bagichaUserName')
-          if (!savedName) {
-            // First time login - ask for name
-            setShowNameInput(true)
-          } else {
-            // User already has name - proceed
-            completeLogin()
+          // Save or fetch user from DynamoDB
+          try {
+            const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`
+            const userResponse = await fetch('/api/users', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id: uid,
+                phone: formattedPhone,
+              }),
+            })
+            
+            const userData = await userResponse.json()
+            
+            if (userData.success && userData.user) {
+              // User saved/fetched successfully
+              // If user has a name, save it to localStorage
+              if (userData.user.name) {
+                localStorage.setItem('bagichaUserName', userData.user.name)
+              }
+              
+              // Check if user already has a name saved
+              const savedName = localStorage.getItem('bagichaUserName')
+              if (!savedName) {
+                // First time login - ask for name
+                setShowNameInput(true)
+                setIsVerifying(false)
+              } else {
+                // User already has name - proceed
+                completeLogin()
+              }
+            } else {
+              // DynamoDB save failed, but continue with login
+              console.warn('Failed to save user to DynamoDB:', userData.error)
+              const savedName = localStorage.getItem('bagichaUserName')
+              if (!savedName) {
+                setShowNameInput(true)
+                setIsVerifying(false)
+              } else {
+                completeLogin()
+              }
+            }
+          } catch (dbError: any) {
+            // DynamoDB error - log but don't block login
+            console.error('Error saving user to DynamoDB:', dbError)
+            const savedName = localStorage.getItem('bagichaUserName')
+            if (!savedName) {
+              setShowNameInput(true)
+              setIsVerifying(false)
+            } else {
+              completeLogin()
+            }
           }
         } else {
           // Show error message
@@ -84,9 +175,35 @@ export default function OTPPage() {
     }
   }
 
-  const handleNameSubmit = () => {
+  const handleNameSubmit = async () => {
     if (userName.trim()) {
-      localStorage.setItem('bagichaUserName', userName.trim())
+      const name = userName.trim()
+      localStorage.setItem('bagichaUserName', name)
+      
+      // Update user in DynamoDB with name
+      const uid = localStorage.getItem('firebaseUID')
+      const phone = localStorage.getItem('bagichaUserPhone')
+      
+      if (uid && phone) {
+        try {
+          const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`
+          await fetch('/api/users', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: uid,
+              phone: formattedPhone,
+              name: name,
+            }),
+          })
+        } catch (error) {
+          // Log error but don't block login
+          console.error('Error updating user name in DynamoDB:', error)
+        }
+      }
+      
       completeLogin()
     }
   }
@@ -167,9 +284,7 @@ export default function OTPPage() {
         
         <div className="otp-content">
           <div className="otp-icon">
-            <svg width="64" height="64" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#fdfcfc" viewBox="0 0 256 256"><path d="M216,50H40A14,14,0,0,0,26,64V224a13.88,13.88,0,0,0,8.09,12.69A14.11,14.11,0,0,0,40,238a13.87,13.87,0,0,0,9-3.31l.06-.05L82.23,206H216a14,14,0,0,0,14-14V64A14,14,0,0,0,216,50Zm2,142a2,2,0,0,1-2,2H80a6,6,0,0,0-3.92,1.46L41.26,225.53A2,2,0,0,1,38,224V64a2,2,0,0,1,2-2H216a2,2,0,0,1,2,2Z"></path></svg>
           </div>
           
           <h2 className="otp-title">Verify OTP</h2>
@@ -200,26 +315,51 @@ export default function OTPPage() {
             </p>
           )}
           <p className="resend-text">
-            Didn't receive the code? <a href="#" className="resend-link" onClick={async (e) => {
-              e.preventDefault()
-              if (isResending) return
-              setIsResending(true)
-              setErrorMessage('')
-              try {
-                const result = await resendOTP(phoneNumber)
-                if (result.success) {
-                  alert('OTP resent successfully')
-                } else {
-                  setErrorMessage(result.error || 'Failed to resend OTP. Please try again.')
+            Didn't receive the code?{' '}
+            <a
+              href="#"
+              className="resend-link"
+              onClick={async (e) => {
+                e.preventDefault()
+                if (isResending || resendDisabled) return
+
+                // Enforce max 5 resends per day per user
+                if (resendCount >= 5) {
+                  setErrorMessage('You have reached the maximum OTP resend limit for today. Please try again tomorrow.')
+                  return
                 }
-              } catch (error: any) {
-                console.error('Error resending OTP:', error)
-                setErrorMessage('Failed to resend OTP. Please try again.')
-              } finally {
-                setIsResending(false)
-              }
-            }}>
-              {isResending ? 'Resending...' : 'Resend'}
+
+                setIsResending(true)
+                setErrorMessage('')
+                try {
+                  const result = await resendOTP(phoneNumber)
+                  if (result.success) {
+                    // Update resend count and persist
+                    const newCount = resendCount + 1
+                    setResendCount(newCount)
+                    localStorage.setItem(RESEND_COUNT_KEY, String(newCount))
+
+                    // Restart 60s countdown
+                    setResendCountdown(60)
+                    setResendDisabled(true)
+                    alert('OTP resent successfully')
+                  } else {
+                    setErrorMessage(result.error || 'Failed to resend OTP. Please try again.')
+                  }
+                } catch (error: any) {
+                  console.error('Error resending OTP:', error)
+                  setErrorMessage('Failed to resend OTP. Please try again.')
+                } finally {
+                  setIsResending(false)
+                }
+              }}
+              style={{ pointerEvents: isResending || resendDisabled ? 'none' : 'auto', opacity: isResending || resendDisabled ? 0.5 : 1 }}
+            >
+              {isResending
+                ? 'Resending...'
+                : resendDisabled
+                ? `Resend in ${resendCountdown}s`
+                : 'Resend'}
             </a>
           </p>
           

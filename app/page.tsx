@@ -28,6 +28,7 @@ export default function Home() {
   const [visibleSections, setVisibleSections] = useState<Set<number>>(new Set([0, 1, 2])); // Load first 3 sections immediately
   const sectionRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const [glowOpacity, setGlowOpacity] = useState(1);
 
   // PERF: Define category sections as constant (doesn't depend on state/props)
   const categorySections = [
@@ -118,6 +119,25 @@ export default function Home() {
     };
   }, [categorySections.length, visibleSections]);
 
+  // Track scroll to fade out glow
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // Fade out over 200px of scrolling
+      const fadeDistance = 200;
+      const opacity = Math.max(0, 1 - scrollY / fadeDistance);
+      setGlowOpacity(opacity);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Set initial opacity
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const handleWishlistClick = () => {
     const isAuthenticated =
       localStorage.getItem("Inkhubuthenticated") === "true";
@@ -167,6 +187,10 @@ export default function Home() {
     <div className="home-page">
       <WishlistToast />
       <CartToast />
+      <div 
+        className="homepage-light-glow"
+        style={{ opacity: glowOpacity }}
+      ></div>
       <FixedHeader
         onWishlistClick={handleWishlistClick}
         onAccountClick={handleAccountClick}

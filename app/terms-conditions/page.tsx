@@ -19,7 +19,6 @@ export default function TermsConditionsPage() {
       </header>
 
       <main className="terms-main">
-        <div className="terms-content">
           <section className="terms-section">
             <h2>1. Introduction</h2>
             <p>
@@ -105,7 +104,6 @@ export default function TermsConditionsPage() {
           <div className="terms-last-updated">
             Last updated: November 6, 2025
           </div>
-        </div>
       </main>
     </div>
   )

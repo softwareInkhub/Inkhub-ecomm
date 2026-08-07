@@ -176,7 +176,6 @@ export default function PrivacyPolicyPage() {
       </header>
 
       <main className="privacy-main">
-        <div className="privacy-content">
           {privacyData.content ? (
             renderContent(privacyData.content)
           ) : (
@@ -187,7 +186,6 @@ export default function PrivacyPolicyPage() {
               Last updated: {privacyData.lastUpdated}
             </div>
           )}
-        </div>
       </main>
     </div>
   )

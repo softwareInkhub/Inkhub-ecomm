@@ -107,7 +107,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onSuccess }) => 
           )}
           <p className="otp-note">An OTP will be sent to your phone number</p>
           <p className="terms-text">
-            By clicking I accept the <a href="#" className="terms-link">Terms and Conditions</a> and <a href="#" className="terms-link">Privacy Policy</a>
+            By clicking, I accept the <a href="#" className="terms-link">Terms &amp; Conditions</a> and <a href="#" className="terms-link">Privacy Policy</a>
           </p>
           <button 
             className="continue-btn" 
